@@ -1,0 +1,983 @@
+import psycopg2
+import json
+import datetime
+import decimal
+from time import mktime
+from flask import Response
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import urllib,urllib2
+import requests
+
+
+#production database
+hostname = 'wf-erp01-wr.withfloats.com'
+username = 'nferp10'
+password = 'nferp10'
+database = 'NowFloatsV10'
+
+#Helps to decode datatypes from postgres output
+class PostgresJsonEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+	if isinstance(obj, datetime.datetime):
+	    try:
+		return (obj.strftime('%Y-%m-%d %HH:%MM:%SS'))
+	    except Exception as e:
+		return str(e)
+
+	if isinstance(obj, datetime.date):
+	    try:
+		return (obj.strftime('%Y-%m-%d'))
+	    except Exception as e:
+		return str(e)
+
+        if isinstance(obj, decimal.Decimal):
+	    try:
+		return float(obj)
+	    except Exception as e:
+		return str(e)
+#            return float(obj)
+
+        return json.JSONEncoder.default(self, obj)
+
+class PostgresConnector:
+
+    def __init__(self):
+	try:
+            self.conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+	    self.conn.autocommit=True
+	except Exception as e:
+	    return str(e)
+
+    #This function is used to check if db connection is established
+    def ConnectToDatabase(self):
+        try:
+            self.conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+	    conn.autocommit = True
+            return "OK"
+        except Exception as e:
+            return str(e)
+
+#APIs using
+
+
+##CHECK THE VALIDITY OF EMPLOYEE BASED ON EMAIL-ID:
+    def GetUserId(self, loginKey):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            query = "SELECT login, id FROM res_users WHERE active='t' and login=%s" % str("'"+loginKey+"'")
+            cur.execute(query)
+
+            results = []
+            columns = ('login', 'userId')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET LEAD DETAILS BASED ON LEAD REFERENCE NUMBER:
+    def GetLeadDetails(self, leadName):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            query = "SELECT lead.name as leadRef,lead.c_customer_fname as customername,lead.c_customer_lname as customerlastname,lead.street as addr1,lead.street2 as addr2,city.name as city,lead.zip,lead.c_contact_mobile as mobile,lead.c_contact_email as email FROM crm_lead lead,ouc_city city WHERE lead.c_city_id = city.id and lead.active='t' and lead.name=%s" % str("'"+leadName+"'")
+            cur.execute(query)
+
+            results = []
+            columns = ('leadRef','customername','customerlastname','addr1','addr2','city','zip','mobile','email')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET INVOICE DETAILS FOR SUPPORT:
+    def GetAllInvoices(self):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            query = "select invoice_number,fptag,sales_conversion_date,package_activation_date,sales_channel,currency_code,validity,base_price,discount_percentage,amount,status,packageid from nf_support_view"
+            cur.execute(query)
+
+            results = []
+            columns = ('invoice_number','fptag','sales_conversion_date','package_activation_date','sales_channel','currency_code','validity','base_price','discount_percentage','amount','status','packageid')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET FOS HANDLE TEMP1:
+    def FHTemp(self):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            query = "select inv_id,user_id,emp_id,name,active,fptags,employee_email from fos_handle_temp1"
+            cur.execute(query)
+
+            results = []
+            columns = ('inv_id','user_id','emp_id','name','active','fptags','employee_email')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET FOS HANDLE MANAGER:
+    def FHManagers(self):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            query = "select user_id,emp_id,emp_handle,reporting_head_id,manager_handle,employee_email,manager_email,chc from fos_handle_emp_manager"
+            cur.execute(query)
+
+            results = []
+            columns = ('user_id','emp_id','emp_handle','reporting_head_id','manager_handle','employee_email','manager_email','chc')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET SALES PERSON EMAIL BASED ON SOURCE DOCUMENT FROM INVOICE:
+    def SPEmail(self,refNumber):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            cur.execute("SELECT res.login as email from account_invoice ai,res_users res where res.id=ai.user_id and ai.origin =%s",(refNumber,))
+            results = []
+            columns = ('email')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET LIST OF ALL LEADS BASED ON EMAIL:
+    def getLeadList(self,spEmail):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            cur.execute("SELECT lead.name as lead_number,lead.c_customer_fname as firstname,lead.c_customer_lname as lastname from crm_lead lead,res_users res where res.id=lead.user_id and res.login =%s",(spEmail,))
+            results = []
+            columns = ('lead_number','firstname','lastname')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#CREATE MEETING
+#Work later
+    def CreateMeeting(self, userlogin,leadNumber,description,meetingstatus,concernedperson,fptag,meetingType):
+        try:
+            if(not self.conn):
+                self.ConnectToDatabase()
+            cur = self.conn.cursor()
+	    create_date = datetime.datetime.now()
+	    try:
+		query_user = "SELECT id from res_users where active='t' and login=%s" % "'"+userlogin+"'"
+		cur.execute(query_user)
+		user_id = cur.fetchone()[0]
+	    except Exception as e:
+		return 'No user existing with the given email'
+	    try:
+		query_lead = "SELECT id from crm_lead where name=%s" % "'"+leadNumber+"'"
+		cur.execute(query_lead)
+		lead_id = cur.fetchone()[0]
+	    except Exception as e:
+		return "Invalid Lead Number"
+	    try:
+		query_section = "SELECT default_section_id from res_users where active='t' and login=%s" % "'"+userlogin+"'"
+		cur.execute(query_section)
+		section_id = cur.fetchone()[0]
+	    except Exception as e:
+		return "Login is not configured. Please contact HR Team"
+
+	    
+	    try:
+		cur.execute("INSERT INTO crm_opportunity2phonecall (create_uid,create_date, user_id, name, categ_id, section_id, note, date, action, nf_meeting_status,nf_contact_status,nf_fptag,nf_demo_meeting) VALUES (%s,%s,%s,%s,9,%s,%s,%s,'log',%s,%s,%s,%s)",(user_id,create_date,user_id,leadNumber,section_id,description,create_date,meetingstatus,concernedperson,fptag,meetingType,))
+		cur.execute("select id,partner_id,mobile00,(select mobile from res_partner WHERE id = partner_id) AS partner_mobile FROM crm_lead WHERE name = %s",(leadNumber,))
+		phone_details = cur.fetchone()
+		cur.execute("INSERT INTO crm_phonecall (name,opportunity_id,user_id,categ_id,description,date,section_id,partner_id,partner_mobile,active) VALUES (%s, %s, %s, 9, %s, %s, %s,%s,%s,'t')",(leadNumber,phone_details[0],user_id,description,create_date,section_id,phone_details[1],phone_details[2],))
+		return "OK"
+	    except Exception as e:
+		return str(e)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+
+
+#GET HIERARCHY OF EMPLOYEE BASED ON EMAIL ID:
+    def getHierarchy(self,empEmail,i=0):
+	i = 0
+	emp_hierarchy = ''
+	try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    while i<5:
+		cur.execute("select parent_id from hr_employee where work_email =%s",(empEmail,))
+		emp_parent_id  = cur.fetchone()
+
+		cur.execute("select coach_id from hr_employee where work_email =%s",(empEmail,))
+		emp_rep_id  = cur.fetchone()
+		if emp_parent_id:
+		    cur.execute("select work_email from hr_employee where id=%s",(emp_parent_id[0],))
+		    emp_parent_email = cur.fetchone()[0]
+		    emp_hierarchy = emp_hierarchy + str(emp_parent_email) + ","
+		if emp_rep_id and (emp_parent_id != emp_rep_id):
+		    cur.execute("select work_email from hr_employee where id=%s",(emp_rep_id[0],))
+		    emp_rep_email = cur.fetchone()[0]
+		    emp_hierarchy = emp_hierarchy + str(emp_rep_email) + ","
+		    empEmail = emp_rep_email
+		else:
+		    emp_hierarchy = emp_hierarchy
+		    i=6
+		i=i+1
+            return emp_hierarchy
+        except Exception as e:
+            return str(e)
+
+#GET EMPLOYEE COUNT WITH RESPECT TO CITY:
+    def getEmployeeCount(self):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+            cur.execute("select count(emp.id),work_location as branch_name from hr_employee emp,resource_resource res where emp.resource_id=res.id and res.active='t' group by emp.work_location order by emp.work_location")
+            results = []
+            columns = ('count','city')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET FOS HANDLE TEMP1 BASED ON FPTAG:
+    def getFPHandleList(self,FPTag):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            cur.execute("select inv_id,user_id,emp_id,name,active,fptags,employee_email from fos_handle_temp1 where fptags LIKE %s",(FPTag,))
+
+            results = []
+            columns = ('inv_id','user_id','emp_id','name','active','fptags','employee_email')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET PACKAGE EXTENSIONS:
+    def GetPackageExtensions(self):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            query = "SELECT reference,creation_date,nf_fptags,sale_type_status,invoice_number,c_pkg_activation_date as package_activation_date,packageid,product_validity,division,customer_name,business_name, customer_mobile,customer_email FROM nf_pkg_extention_view"
+            cur.execute(query)
+
+            results = []
+            columns = ('reference','creation_date','fptag','sale_type','invoice_number','package_activation_date','packageid','validity','sales_channel','customer_segment','customername','businessname','customermobile','customeremail')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET ACTIVE EMPLOYEE AND RESPECTIVE DESIGNATIONS:
+    def GetActiveEmployees(self):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            query = "SELECT res.name,emp.nf_emp,emp.work_email,job.name,ofh.name, emp.c_nf_chc, div.name AS division FROM hr_employee emp,resource_resource res,hr_job job, ouc_fos_handle ofh, hr_department div where emp.resource_id=res.id and emp.intrnl_desig=job.id and emp.c_fos_handle = ofh.id and emp.sub_dep = div.id and res.active='t'"
+            cur.execute(query)
+
+            results = []
+            columns = ('name', 'employeeId', 'email', 'designation', 'fosHandle', 'CFT', 'division')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+
+#GET SPECIFIC EMPLOYEE AND RESPECTIVE DESIGNATIONS:
+    def GetSpecificEmployees(self,email):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+
+            query = "SELECT res.name,emp.nf_emp,emp.work_email,job.name,ofh.name, emp.c_nf_chc, div.name AS division FROM hr_employee emp,resource_resource res,hr_job job, ouc_fos_handle ofh, hr_department div where emp.resource_id=res.id and emp.intrnl_desig=job.id and emp.c_fos_handle = ofh.id and emp.sub_dep = div.id and res.active='t' and work_email=%s" % str("'"+email+"'")
+            cur.execute(query)
+
+            results = []
+            columns = ('name', 'employeeId', 'email', 'designation', 'fosHandle', 'CFT', 'division')
+            for row in cur.fetchall():
+                json_row = (dict(zip(columns, row)))
+                results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET LATEST INVOICE DETAILS:
+    def GetLatestInvoice(self,fptag):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    try:
+		cur.execute("select max(package_activation_date) from nf_inv_fos_handle_view where fptag=%s",(fptag,))
+		act_date = cur.fetchone()[0]
+		if act_date == None:
+		    return "No Invoice Found for the mentioned FPTAG"
+	    except:
+		return "No Invoice Found for the mentioned FPTAG"
+
+	    cur.execute("select count(*) from nf_inv_fos_handle_view where fptag=%s and package_activation_date=%s",(fptag,act_date,))
+	    count_same_day_activations = cur.fetchone()[0]
+	    if count_same_day_activations<1:
+		return "No Invoice Found for the mentioned FPTAG"
+	    else:
+		cur.execute("select max(invoice_number) from nf_inv_fos_handle_view where fptag=%s and package_activation_date=%s",(fptag,act_date,))
+		latest_inv_num = cur.fetchone()[0]
+		
+		cur.execute("select fptag,package_activation_date,invoice_number,customer_name,customer_city,customer_state,invoice_status,sp_email,sp_fos_handle,sp_reporting_head_email,sp_manager_email,sp_name,sp_branch,sp_branch_city,sp_branch_state,chc_email from nf_inv_fos_handle_view where fptag=%s and package_activation_date=%s and invoice_number=%s",(fptag,act_date,latest_inv_num,))
+		inv_num = cur.fetchall()
+		
+		results = []
+		columns = ('fptag','package_activation_date','invoice_number','customer_name','customer_city','customer_state','invoice_status','sp_email','sp_fos_handle','sp_reporting_head_email','sp_manager_email','sp_name','sp_branch','sp_branch_city','sp_branch_state','chc_email')
+		for row in inv_num:
+		    json_row = (dict(zip(columns, row)))
+		    results.append(json_row)
+		res = json.dumps(results, cls=PostgresJsonEncoder)
+		return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#Update CHC
+    def updateCHC(self,fptag,email):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    try:
+		cur.execute("select emp.id from hr_employee emp,resource_resource res where emp.resource_id=res.id and emp.work_email=%s and res.active='t'",(email,))
+		emp_id = cur.fetchone()[0]
+	    except:
+		return "No Employee active with the given email id"
+	    try:
+		cur.execute("select id from account_invoice where number=%s and type='out_invoice'",(invNumber,))
+		inv_id = cur.fetchone()[0]
+	    except:
+		return "The given invoice number is in valid"
+	    try:
+#query to get the id of the fptag from fptag table
+		cur.execute("select id from ouc_fptag where name=%s",(fptag,))
+		fptag_id = cur.fetchone()[0]
+		if fptag_id:
+		    cur.execute("update account_invoice set nf_chc=%s from account_invoice_line ail where account_invoice.id=ail.invoice_id and ail.c_fptags_id=%s and account_invoice.state='paid' and account_invoice.type='out_invoice'",(emp_id,fptag_id,))
+		    conn.commit()
+		    return "Success"
+		else:
+		    return "FPTAG is not present in ERP"
+	    except:
+		return "Update failed"
+        except Exception as e:
+            return str(e)
+
+
+#GET PROFORMA INVOICE NUMBERS FOR A SALES PERSON
+    def getPIList(self,email):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    try:
+		cur.execute("select id from res_users where active='t' and login=%s",(email,))
+		user_id = cur.fetchone()[0]
+		if user_id == None:
+		    return "No user existing with the given email id"
+	    except:
+		return "No user existing with the given email id"
+
+	    try:
+		cur.execute("select em.id from hr_employee em,resource_resource re where re.id=em.resource_id and re.active='t' and re.user_id=%s",(user_id,))
+		emp_id = cur.fetchone()[0]
+		if emp_id == None:
+		    return "The user is not mapped to any active Employee. Please contact HR Team"
+	    except:
+		return "The user is not mapped to any active Employee. Please contact HR Team"
+
+	    cur.execute("select so.name as pi_number from sale_order so,res_partner rp where so.partner_id=rp.id and so.state in ('draft','sent','accept') and ((so.user_id=%s and so.c_sales_support_id is NULL) or (so.c_sales_support_id=%s))",(user_id,emp_id,))
+	    pi_numbers = cur.fetchall()
+		
+	    results = []
+#	    columns = ('pi_number')
+	    for row in pi_numbers:
+		row=row[0]
+		columns = row.upper()
+		json_row = (columns, row)
+		results.append(json_row)
+	    res = json.dumps(dict(results), cls=PostgresJsonEncoder)
+	    return  Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET PROFORMA INVOICE CUSTOMER LIST FOR A SALES PERSON
+    def getPICustomerList(self,email):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    try:
+		cur.execute("select id from res_users where active='t' and login=%s",(email,))
+		user_id = cur.fetchone()[0]
+		if user_id == None:
+		    return "No user existing with the given email id"
+	    except:
+		return "No user existing with the given email id"
+
+	    try:
+		cur.execute("select em.id from hr_employee em,resource_resource re where re.id=em.resource_id and re.active='t' and re.user_id=%s",(user_id,))
+		emp_id = cur.fetchone()[0]
+		if emp_id == None:
+		    return "The user is not mapped to any active Employee. Please contact HR Team"
+	    except:
+		return "The user is not mapped to any active Employee. Please contact HR Team"
+
+	    cur.execute("select rp.name as customername from sale_order so,res_partner rp where so.partner_id=rp.id and so.state in ('draft','sent') and ((so.user_id=%s and so.c_sales_support_id is NULL) or (so.c_sales_support_id=%s))",(user_id,emp_id,))
+	    pi_numbers = cur.fetchall()
+		
+	    results = []
+#	    columns = ('customername')
+	    for row in pi_numbers:
+		row=row[0]
+		columns = row.upper()
+		json_row = (columns, row)
+		results.append(json_row)
+	    res = json.dumps(dict(results), cls=PostgresJsonEncoder)
+	    return  Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#GET Proforma Invoice Numbers List FOR A SALES PERSON and Customer Name
+    def getPIListForCustomer(self,email,customerName):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    try:
+		cur.execute("select id from res_users where active='t' and login=%s",(email,))
+		user_id = cur.fetchone()[0]
+		if user_id == None:
+		    return "No user existing with the given email id"
+	    except:
+		return "No user existing with the given email id"
+
+	    try:
+		cur.execute("select em.id from hr_employee em,resource_resource re where re.id=em.resource_id and re.active='t' and re.user_id=%s",(user_id,))
+		emp_id = cur.fetchone()[0]
+		if emp_id == None:
+		    return "The user is not mapped to any active Employee. Please contact HR Team"
+	    except:
+		return "The user is not mapped to any active Employee. Please contact HR Team"
+
+	    cur.execute("select so.name as piNumber from sale_order so,res_partner rp where so.partner_id=rp.id and so.state in ('draft','sent') and ((so.user_id=%s and so.c_sales_support_id is NULL) or (so.c_sales_support_id=%s)) and rp.name=%s",(user_id,emp_id,customerName,))
+	    pi_numbers = cur.fetchall()
+		
+	    results = []
+#	    columns = ('PiNumber')
+	    for row in pi_numbers:
+		row=row[0]
+		columns = row.upper()
+		json_row = (columns, row)
+		results.append(json_row)
+	    res = json.dumps(dict(results), cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+
+#GET PROFORMA INVOICE Detials BASED ON PROFORMA INVOICE NUMBER
+    def getPIDetails(self,refNumber):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    try:
+		cur.execute("select COUNT(*) from sale_order where name=%s and state in ('draft','sent','accept')",(refNumber,))
+		number_confirmation = cur.fetchone()[0]
+		if number_confirmation == 0:
+		    return "INVALID REFERENCE NUMBER"
+	    except:
+		return "INVALID REFERENCE NUMBER"
+
+	    cur.execute("select proforma_inv_number,sp_email,sp_city,sp_division,sp_name,business_name,fptags,product,qty,type_of_sale,so_state,discount,unitprice,sol_id,package_id,price_tax,price_untax,price_total, tax_percentage  from nf_so_view where proforma_inv_number=%s",(refNumber,))
+	    pi_details = cur.fetchall()
+	    if pi_details:
+		results = []
+		columns = ('proforma_inv_number','sp_email','sp_city','sp_division','sp_name','business_name','fptags','product','qty','type_of_sale','so_state','discount','unitprice','sol_id','package_id','price_tax','price_untax','price_total','tax_percentage')
+		for row in pi_details:
+		    json_row = (dict(zip(columns, row)))
+		    results.append(json_row)
+		res = json.dumps(results, cls=PostgresJsonEncoder)
+		return Response(res, content_type='application/json; charset=utf-8')
+	    else:
+		return "NO PRODUCTS ADDED IN THE PROFORMA INVOICE"
+        except Exception as e:
+            return str(e)
+
+#GET Previous Sale Details
+    def getPreviousSale(self,fptag,packageid):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    cur.execute("select id from ouc_fptag where name=%s",(fptag,))
+	    fptag_id = cur.fetchone()[0]
+	    try:
+		cur.execute("select ai.origin as saleorder,ail.price_subtotal as price,ai.date_invoice as inv_date from account_invoice ai,account_invoice_line ail,product_product pr where ai.id=ail.invoice_id and pr.id=ail.product_id and ail.c_fptags_id=%s and ai.state='paid' order by ai.date_invoice desc",(fptag_id,))
+		previous_details = cur.fetchall()
+		if previous_details:
+		    previous_details=previous_details[0]
+		    results = []
+		    columns = ('saleorder','price','date')
+		    results = (dict(zip(columns, previous_details)))
+		    res = json.dumps(results, cls=PostgresJsonEncoder)
+		    return Response(res, content_type='application/json; charset=utf-8')
+		else:
+		    return "NO PRODUCTS ADDED IN THE PROFORMA INVOICE"
+	    except Exception as e:
+		return str(e)
+        except Exception as e:
+            return str(e)
+
+#Update Discount
+#Change it
+    def updateDiscount(self,lineid,discount,approvalstatus):
+	discount = float(discount)
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    try:
+		cur.execute("select order_id from sale_order_line where id=%s",(lineid,))
+		order_id=cur.fetchone()[0]
+		cur.execute("select price_unit from sale_order_line where id=%s",(lineid,))
+		price_unit=cur.fetchone()[0]
+		cur.execute("select product_uom_qty from sale_order_line where id=%s",(lineid,))
+		quantity=cur.fetchone()[0]
+	    except:
+		return "Sale Order Not Found"
+
+	#update order line
+	    try:
+		price_subtotal = float(price_unit)*float(quantity)*(1-discount/100)
+		nf_tax_amount = float(price_subtotal)*0.18
+		nf_price_subtotal_with_tax = float(nf_tax_amount) + float(price_subtotal)
+		cur.execute("update sale_order_line set discount=%s,price_tax=%s,c_price_sub_with_tax=%s,price_subtotal=%s,price_total=%s where id=%s",(discount,nf_tax_amount,nf_price_subtotal_with_tax, price_subtotal,nf_price_subtotal_with_tax,lineid,))
+		conn.commit()
+	    except:
+		return "problem updating the sale order line"
+
+	#update sale order
+	    try:
+		cur.execute("select sum(round(product_uom_qty*(sol.price_unit-(sol.price_unit*sol.discount/100)),2)) from sale_order_line sol where sol.id!=%s and sol.order_id=%s",(lineid,order_id,))
+		other_subtotal = cur.fetchone()
+		if other_subtotal:
+		    other_subtotal= other_subtotal[0]
+		else:
+		    other_subtotal = 0.00
+		if other_subtotal:
+		    other_subtotal= other_subtotal
+		else:
+		    other_subtotal = 0.00
+		amount_untaxed = float(price_subtotal) + float(other_subtotal)
+		amount_tax = float(amount_untaxed)*0.18
+		amount_total = float(amount_tax) + float(amount_untaxed)
+		cur.execute("update sale_order set amount_untaxed=%s,amount_tax=%s,amount_total=%s,disc_approval_status=%s where id=%s",(amount_untaxed,amount_tax,amount_total,approvalstatus,order_id,))
+		conn.commit()
+		return "Success"
+	    except:
+		return "problem updating the sale order"
+        except Exception as e:
+            return str(e)
+
+
+#GET INVOICE FOR WHICH CHC IS NOT ASSIGNED:
+    def getnoCHCDetails(self):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    cur.execute("select fptag,package_activation_date,invoice_number,customer_name,customer_city,customer_state,invoice_status,sp_email,sp_fos_handle,sp_reporting_head_email,sp_manager_email,sp_name,sp_branch,sp_branch_city,sp_branch_state,chc_email from nf_inv_fos_handle_view where chc_email is NULL")
+	    inv_num = cur.fetchall()
+		
+	    results = []
+	    columns = ('fptag','package_activation_date','invoice_number','customer_name','customer_city','customer_state','invoice_status','sp_email','sp_fos_handle','sp_reporting_head_email','sp_manager_email','sp_name','sp_branch','sp_branch_city','sp_branch_state','chc_email')
+	    for row in inv_num:
+		json_row = (dict(zip(columns, row)))
+		results.append(json_row)
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+
+#GET GET LEAD NUMBER BASED ON CUSTOMER EMAIL AND SALES PERSON EMAIL:
+    def getLeadNumberforCHC(self,customeremail,spemail):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    try:
+		cur.execute("select id from res_users where login=%s and active='t'",(spemail,))
+		sp_id = cur.fetchone()[0]
+	    except:
+		return "CHC OR sALES PERSON EMAIL ID DOESNOT EXISTS"
+	    try:
+		cur.execute("select name as leadnumber from crm_lead where c_contact_email =%s and user_id=%s and c_state not in ('done','cancel')",(customeremail,sp_id,))
+		lead_num = cur.fetchone()[0]
+	    except:
+		return "NO LEAD EXISTING"
+		
+	    results = []
+	    columns = ('leadnumber')
+
+	    res = json.dumps(lead_num, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+
+#GET LATEST INVOICE DETAILS with list of FPTAGs:
+    def listOfLatestInvoice(self,fptags):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	    i=0
+	    results = []
+	    columns = ('fptag','package_activation_date','invoice_number','customer_name','customer_city','customer_state','invoice_status','sp_email','sp_fos_handle','sp_reporting_head_email', 'sp_manager_email','sp_name','sp_branch','sp_branch_city','sp_branch_state','chc_email')
+	    while i<len(fptags):
+		fptag = fptags[i]
+		cur.execute("select count(*) from nf_inv_fos_handle_view where fptag=%s",(fptag,))
+		count_same_day_activations = cur.fetchone()[0]
+		if count_same_day_activations>=1:
+		    cur.execute("select max(invoice_number) from nf_inv_fos_handle_view where fptag=%s",(fptag,))
+		    latest_inv_num = cur.fetchone()[0]
+		
+		    cur.execute("select fptag,package_activation_date,invoice_number,customer_name,customer_city,customer_state,invoice_status,sp_email,sp_fos_handle,sp_reporting_head_email,sp_manager_email,sp_name,sp_branch,sp_branch_city,sp_branch_state,chc_email from nf_inv_fos_handle_view where fptag=%s and invoice_number=%s",(fptag,latest_inv_num,))
+		    inv_det = cur.fetchall()
+		    for row in inv_det:
+			json_row = (dict(zip(columns, row)))
+			results.append(json_row)
+		i=i+1
+
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    return Response(res, content_type='application/json; charset=utf-8')
+        except Exception as e:
+            return str(e)
+
+#--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    def send_sp_email(self, emp_email, employee_name, lead_no, business_name, customer_mobile, customer_email, customer_name, fptag):
+		
+	   mail_subject = "Urgent - %s has received an enquiry - Call them ASAP" % (fptag)
+
+           html = """<!DOCTYPE html>
+	                    <html>
+
+	                        <body>
+				   <p style="color:#4E0879">Hi """+str(employee_name)+""",</p>
+				   <p>Your Customer """+str(fptag)+""" has received an enquiry/Potential call on their business website. Please contact him/her ASAP.</p>
+
+			<p>Following are details :</p>
+
+			<table style="width:100%">
+	                          <tr style="width:100%">
+	                            <td style="width:15%"><b>Lead</b></td>
+	                            <td style="width:55%">: <span>"""+str(lead_no)+"""</span></td>
+				    <td style="width:30%"></td>
+	                          </tr>
+
+				  <tr style="width:100%">
+	                            <td style="width:15%"><b>Customer Name</b></td>
+	                            <td style="width:55%">: <span>"""+str(customer_name)+"""</span></td>
+				    <td style="width:30%"></td>
+	                          </tr>
+
+	                          <tr style="width:100%">
+	                            <td style="width:15%"><b>Business Name</b></td>
+	                            <td style="width:55%">: <span>"""+str(business_name)+"""</span></td>
+				    <td style="width:30%"></td>
+	                          </tr>
+				  
+				  <tr style="width:100%">
+	                            <td style="width:15%"><b>Customer Mobile</b></td>
+	                            <td style="width:55%">: <span>"""+str(customer_mobile)+"""</span></td>
+				    <td style="width:30%"></td>
+	                          </tr>
+
+				 <tr style="width:100%">
+	                            <td style="width:15%"><b>customer Email</b></td>
+	                            <td style="width:55%">: <span>"""+str(customer_email)+"""</span></td>
+				    <td style="width:30%"></td>
+	                          </tr>	
+				
+				 <tr style="width:100%">
+	                            <td style="width:15%"><b>FP Tag</b></td>
+	                            <td style="width:55%">: <span>"""+str(fptag)+"""</span></td>
+				    <td style="width:30%"></td>
+	                          </tr>	
+			</table>
+
+				
+	                <div>
+	                    <p></p>
+	                </div>
+                     <p>Best Regards,<br/>
+		       RIA</p>
+	        <html>"""
+		   
+	
+
+	   email_id = [emp_email]
+	   cc_id = ['mohit.katiyar@nowfloats.com','ria.nf@nowfloats.com']
+	   msg = MIMEMultipart('alternative')
+	   text = "plaintext"
+	   part1 = MIMEText(text, 'plain')
+	   html = html
+	   part2 = MIMEText(html, 'html')
+	   url = 'https://api.withfloats.com/Internal/v1/PushEmailToQueue/A91B82DE3E93446A8141A52F288F69EFA1B09B1D13BB4E55BE743AB547B3489E'
+	   vals = {"ClientId": "A91B82DE3E93446A8141A52F288F69EFA1B09B1D13BB4E55BE743AB547B3489E", "EmailBody": html,
+			"ReplyTo": "hello@nowfloats.com", "Subject": mail_subject, "To": email_id, "Type": 0, "CC": cc_id}
+	   req = urllib2.Request(url)
+	   req.add_header('Content-Type', 'application/json')
+	   data = json.dumps(vals)
+	   response = urllib2.urlopen(req, data)
+	   encoder = response.read().decode('utf-8')
+	   return True
+
+    def send_ria_email(self, fptag):
+		
+	   mail_subject = "Urgent - %s has received an enquiry - Call them ASAP" % (fptag)
+
+           html = """<!DOCTYPE html>
+	                    <html>
+
+	                        <body>           
+				   <p><b>"""+str(fptag)+"""</b> has received an enquiry/Potential call on their business website. Please call them ASAP.</p></br>
+
+				
+	                <div>
+	                    <p></p>
+	                </div>
+                     <p>Best Regards,<br/>
+		       RIA</p>
+	        <html>"""
+		   
+	
+
+	   email_id = ['ria.nf@nowfloats.com']
+	   cc_id = ['mohit.katiyar@nowfloats.com']
+	   msg = MIMEMultipart('alternative')
+	   text = "plaintext"
+	   part1 = MIMEText(text, 'plain')
+	   html = html
+	   part2 = MIMEText(html, 'html')
+	   url = 'https://api.withfloats.com/Internal/v1/PushEmailToQueue/A91B82DE3E93446A8141A52F288F69EFA1B09B1D13BB4E55BE743AB547B3489E'
+	   vals = {"ClientId": "A91B82DE3E93446A8141A52F288F69EFA1B09B1D13BB4E55BE743AB547B3489E", "EmailBody": html,
+			"ReplyTo": "hello@nowfloats.com", "Subject": mail_subject, "To": email_id, "Type": 0, "CC": cc_id}
+	   req = urllib2.Request(url)
+	   req.add_header('Content-Type', 'application/json')
+	   data = json.dumps(vals)
+	   response = urllib2.urlopen(req, data)
+	   encoder = response.read().decode('utf-8')
+	   return True	
+
+    def send_lead_sms(self, emp_mobile, employee_name, lead_no, business_name, customer_mobile, customer_email, fptag):
+	if emp_mobile:
+		url = "https://api.withfloats.com/Discover/v1/floatingpoint/CreateSMS"
+		mobile_no = emp_mobile
+		message = "Hi, \n"+str(fptag)+" with Lead Ref "+str(lead_no)+" has received an enquiry/potential call , please call them  on "+str(customer_mobile)+" ASAP."
+	
+		querystring = {"mobileNumber":emp_mobile,"message":message}
+		data = json.dumps("A91B82DE3E93446A8141A52F288F69EFA1B09B1D13BB4E55BE743AB547B3489E")
+		
+		headers = {
+			    'content-type': "application/json",
+			    }
+		response = requests.request("POST", url, data=data, headers=headers, params=querystring)
+    	        return True	  
+
+
+#send_enquiry_email
+
+    def send_roi_enquiry_email(self,fptag):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+        except Exception as e:
+            return str(e)
+
+        try:
+  	  cur.execute("SELECT COALESCE(emp.work_email,'') AS emp_email, emp.mobile_phone, lead.name, lead.name001 AS business_name, lead.mobile00 AS cust_mobile, lead.email00 AS cust_email, emp.name_related AS employee_name, lead.name00 AS customer_name FROM crm_lead lead LEFT JOIN resource_resource res ON res.user_id = lead.user_id LEFT  JOIN hr_employee emp ON emp.resource_id = res.id WHERE res.active = True AND lead.fax00 = %s",(fptag,))
+	  
+ 	  temp = cur.fetchone()
+	  if temp:
+	     emp_email = temp[0]
+	     emp_mobile = temp[1]
+	     lead_no = temp[2]
+	     business_name = temp[3]
+	     customer_mobile = temp[4]
+	     customer_email = temp[5]	
+	     employee_name = temp[6]	
+	     customer_name = temp[7]	
+
+	     self.send_sp_email(emp_email, employee_name, lead_no, business_name, customer_mobile, customer_email, customer_name, fptag) 
+	     self.send_lead_sms(emp_mobile, employee_name ,lead_no, business_name, customer_mobile, customer_email, fptag)   
+	  else:
+	      self.send_ria_email(fptag) 
+	  conn.close()		
+	  return "Success"
+        except Exception as e:
+	    conn.close()   
+            return str(e)
+
+
+   #GetThdAchievement
+    def ThdAchievement(self, email_id):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	except Exception as e:
+            return str(e)
+
+	try:
+	   cur.execute("SELECT id FROM res_users WHERE login = %s",(email_id,))
+	   temp = cur.fetchone()[0]
+	except:
+	   conn.close()
+	   return "No email id OR email id is invalid"
+	
+	try:
+	   cur.execute("select (to_char(month,'month')||'-'||date_part('year',month)) AS thd_month,ytd,achievement,crr_frwd,date_part('month',month) AS month_num FROM thd_achievement_view WHERE email_id = %s AND month <= now() at time zone 'utc' ORDER BY month_num DESC",(email_id,))
+	   thd_data = cur.fetchall()
+	   columns = ('month','threshold','achievement','carry_forward')
+	   results = map(lambda x:(dict(zip(columns, x))),thd_data)
+	   res = json.dumps(results, cls=PostgresJsonEncoder)
+	   conn.close()
+	   return Response(res, content_type='application/json; charset=utf-8')
+	except Exception as e:
+	    conn.close()
+            return str(e)
+
+
+#GetMeetingData
+    def MeetingData(self, email_id):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	except Exception as e:
+            return str(e)
+
+	try:
+	   cur.execute("SELECT id FROM res_users WHERE login = %s",(email_id,))
+	   temp = cur.fetchone()[0]
+	except:
+	   conn.close()
+	   return "No email id OR email id is invalid"
+	
+	try:
+	   cur.execute("select (to_char(date_of_meeting,'month')||'-'||date_part('year',date_of_meeting)) AS month,meeting_type,SUM(number_of_meeting),date_part('month',date_of_meeting) AS month_num FROM crm_meeting_view WHERE emp_email = %s AND date_of_meeting::date > (now() at time zone 'utc' - INTERVAL '3 month')::date GROUP BY month,meeting_type,month_num ORDER BY month_num DESC",(email_id,))
+	   meeting_data = cur.fetchall()
+	   columns = ('month','meeting_type','number_of_meeting')
+	   results = map(lambda x:(dict(zip(columns, x))),meeting_data)
+	   res = json.dumps(results, cls=PostgresJsonEncoder)
+	   conn.close()
+	   return Response(res, content_type='application/json; charset=utf-8')
+	except Exception as e:
+	    conn.close()
+            return str(e)
+
+
+#GetFosRank
+    def FosRank(self, email_id):
+        try:
+            conn = psycopg2.connect(host=hostname, user=username, password=password, dbname=database)
+            cur = conn.cursor()
+	except Exception as e:
+            return str(e)
+
+	try:
+	   cur.execute("SELECT id FROM res_users WHERE login = %s",(email_id,))
+	   temp = cur.fetchone()[0]
+	except:
+	   conn.close()
+	   return "No email id OR email id is invalid"
+	
+	try:
+	   cur.execute("select rank FROM nf_buddy_view WHERE emp_email = %s AND so_number > 3",(email_id,))
+	   branch_rank = cur.fetchone()
+           cur.execute("select rank FROM nf_national_buddy_view WHERE emp_email = %s AND so_number > 3",(email_id,))
+	   national_rank = cur.fetchone()
+	   results = {
+		      'national_rank':national_rank[0],	
+		      'branch_rank':branch_rank[0],
+		      'status':'Eligible'
+		      }
+	   res = json.dumps(results, cls=PostgresJsonEncoder)
+	   conn.close()
+	   return Response(res, content_type='application/json; charset=utf-8')
+	except Exception as e:
+	    conn.close()
+            results = {
+		      'status':'Not Eligible'
+		      }
+	    res = json.dumps(results, cls=PostgresJsonEncoder)
+	    conn.close()
+	    return Response(res, content_type='application/json; charset=utf-8')
+
+#ExotelIncomingCall
+    def ExotelIncomingCall(self, CallFrom, CallTo):
+	try:
+	   results = "8588096002"
+	   res = json.dumps(results, cls=PostgresJsonEncoder)
+	   return Response(res, content_type='application/json; charset=utf-8')
+	except Exception as e:
+            results = "9756285636"
+	    return results
+	   
+	    
+	    
+        
+
+
