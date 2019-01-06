@@ -130,17 +130,12 @@ def importFreightInvoice():
     invoiceDate = ''
     try:
        if rawfile:  
-    	  dom  = xmltodict.parse(rawfile)['invoice'] #['xml']['From']
-          for key, value in dom.iteritems(): 
-	      #print"======key, value======",  key, value    #value['@xmlns:xsi']
-	      if key == 'transNo':
-		 transNo = value
-	      if key == 'invoiceDate':
-	         invoiceDate = value
-	  #print"=====transNo====", transNo, invoiceDate
-	  if transNo and invoiceDate:
-             return PostgresConnector().importFreightInvoice(transNo, invoiceDate)
-	  return "Some Error Occured"
+    	  invoice_vals  = xmltodict.parse(rawfile)['invoice'] #['xml']['From']
+          #invoice_vals = dict(val for val in res.iteritems())
+	  
+          return PostgresConnector().importFreightInvoice(invoice_vals)
+       else:
+	   return "Some Error Occured"
     except:
 	return "Some Error Occured"
 
