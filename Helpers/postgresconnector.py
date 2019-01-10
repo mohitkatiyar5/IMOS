@@ -103,6 +103,15 @@ class PostgresConnector:
 	    cur.close()
             return str(e)
 
+    def validate(self, value):
+	if value:
+	   value = value.encode('utf8') 
+	   if isinstance(value, str): 
+	      value = repr(value.replace("'", "''"))
+	else:
+	   return 'Null'   
+	return value
+
 
 #importIMOSInvoice:
     def importFreightInvoice(self, invoice_vals):
@@ -110,59 +119,69 @@ class PostgresConnector:
 	    if(not self.conn):
                 self.ConnectToDatabase()
             cur = self.conn.cursor()
-	    print"==========invoice_vals==========", invoice_vals
-	    status = invoice_vals.get('status', None)
-	    transNo = invoice_vals.get('transNo', None)
-	    transType = invoice_vals.get('transType', None)
-	    externalRefId = invoice_vals.get('externalRefId', None)
-            billExternalRef = invoice_vals.get('billExternalRef', None)
-	    vendorNo = invoice_vals.get('vendorNo', None)
-            vendorName = invoice_vals.get('vendorName', None)
-	    vendorShortName = invoice_vals.get('vendorShortName', None)
-            vendorExternalRef = invoice_vals.get('vendorExternalRef', None)
-	    vendorType = invoice_vals.get('vendorType', None)
-	    vendorCountryCode = invoice_vals.get('vendorCountryCode', None)
-	    vendorCrossRef = invoice_vals.get('vendorCrossRef', None)
-	    vendorCareOf = invoice_vals.get('vendorCareOf', None)
-            vendorCareOfRef = invoice_vals.get('vendorCareOfRef', None)
-	    vendorCareOfCountryCode = invoice_vals.get('vendorCareOfCountryCode', None)
-            invoiceNo = invoice_vals.get('invoiceNo', None)
-	    revInvoiceNo = invoice_vals.get('revInvoiceNo', None)
-            purchaseOrderNo = invoice_vals.get('purchaseOrderNo', None)
-	    memo = invoice_vals.get('memo', None)
-	    billRemarks = invoice_vals.get('billRemarks', None)
-	    approval = invoice_vals.get('approval', None)
-	    paymentTermsCode = invoice_vals.get('paymentTermsCode', None)
-            invoiceDate = invoice_vals.get('invoiceDate', None)
-	    entryDate = invoice_vals.get('entryDate', None)
-            actDate = invoice_vals.get('actDate', None)
-	    dueDate = invoice_vals.get('dueDate', None)
-            exchangeRateDate = invoice_vals.get('exchangeRateDate', None)
-	    remarks = invoice_vals.get('remarks', None)
-	    cpDate = invoice_vals.get('cpDate', None)
-	    aparCode = invoice_vals.get('aparCode', None)
-	    currencyAmount = invoice_vals.get('currencyAmount', None)
-            currency = invoice_vals.get('currency', None)
-	    exchangeRate = invoice_vals.get('exchangeRate', None)
-            baseCurrencyAmount = invoice_vals.get('baseCurrencyAmount', None)
-	    oprTransNo = invoice_vals.get('oprTransNo', None)
-            oprBillSource = invoice_vals.get('oprBillSource', None)
-	    remittanceSeq = invoice_vals.get('remittanceSeq', None)
-	    remittanceCompNo = invoice_vals.get('remittanceCompNo', None)
-	    remittanceAccountNo = invoice_vals.get('remittanceAccountNo', None)
-	    remittanceBankName = invoice_vals.get('remittanceBankName', None)
-            remittanceExternalRef = invoice_vals.get('remittanceExternalRef', None)
-	    remittanceSwiftCode = invoice_vals.get('remittanceSwiftCode', None)
-            remittanceFullName = invoice_vals.get('remittanceFullName', None)
-	    remittanceIban = invoice_vals.get('remittanceIban', None)
-            docNo = invoice_vals.get('docNo', None)
-	    companyBU = invoice_vals.get('companyBU', None)
-            counterpartyBU = invoice_vals.get('counterpartyBU', None)
-	    paymentAccountNo = invoice_vals.get('paymentAccountNo', None)
-	    paymentBank = invoice_vals.get('paymentBank', None)
-	    paymentBankCode = invoice_vals.get('paymentBankCode', None)
-	    lastUserId = invoice_vals.get('lastUserId', None)
-            lastModifiedDate = invoice_vals.get('lastModifiedDate', None)
+	    status = self.validate(invoice_vals.get('status', None))
+	    transNo = self.validate(invoice_vals.get('transNo', None))
+	    transType = self.validate(invoice_vals.get('transType', None))
+	    externalRefId = self.validate(invoice_vals.get('externalRefId', None))
+            billExternalRef = self.validate(invoice_vals.get('billExternalRef', None))
+	    vendorNo = self.validate(invoice_vals.get('vendorNo', None))
+            vendorName = self.validate(invoice_vals.get('vendorName', None))
+	    vendorShortName = self.validate(invoice_vals.get('vendorShortName', None))
+            vendorExternalRef = self.validate(invoice_vals.get('vendorExternalRef', None))
+	    vendorType = self.validate(invoice_vals.get('vendorType', None))
+	    vendorCountryCode = self.validate(invoice_vals.get('vendorCountryCode', None))
+	    vendorCrossRef = self.validate(invoice_vals.get('vendorCrossRef', None))
+	    vendorCareOf = self.validate(invoice_vals.get('vendorCareOf', None))
+            vendorCareOfRef = self.validate(invoice_vals.get('vendorCareOfRef', None))
+	    vendorCareOfCountryCode = self.validate(invoice_vals.get('vendorCareOfCountryCode', None))
+            invoiceNo = self.validate(invoice_vals.get('invoiceNo', None))
+	    revInvoiceNo = self.validate(invoice_vals.get('revInvoiceNo', None))
+            purchaseOrderNo = self.validate(invoice_vals.get('purchaseOrderNo', None))
+	    memo = self.validate(invoice_vals.get('memo', None))
+	    billRemarks = self.validate(invoice_vals.get('billRemarks', None))
+	    approval = self.validate(invoice_vals.get('approval', None))
+	    paymentTermsCode = self.validate(invoice_vals.get('paymentTermsCode', None))
+            invoiceDate = self.validate(invoice_vals.get('invoiceDate', None))
+	    entryDate = self.validate(invoice_vals.get('entryDate', None))
+            actDate = self.validate(invoice_vals.get('actDate', None))
+	    dueDate = self.validate(invoice_vals.get('dueDate', None))
+            exchangeRateDate = self.validate(invoice_vals.get('exchangeRateDate', None))
+	    remarks = self.validate(invoice_vals.get('remarks', None))
+	    cpDate = self.validate(invoice_vals.get('cpDate', None))
+	    aparCode = self.validate(invoice_vals.get('aparCode', None))
+	    currencyAmount = self.validate(invoice_vals.get('currencyAmount', None))
+            currency = self.validate(invoice_vals.get('currency', None))
+	    exchangeRate = self.validate(invoice_vals.get('exchangeRate', None))
+            baseCurrencyAmount = self.validate(invoice_vals.get('baseCurrencyAmount', None))
+	    oprTransNo = self.validate(invoice_vals.get('oprTransNo', None))
+            oprBillSource = self.validate(invoice_vals.get('oprBillSource', None))
+	    remittanceSeq = self.validate(invoice_vals.get('remittanceSeq', None))
+	    remittanceCompNo = self.validate(invoice_vals.get('remittanceCompNo', None))
+	    remittanceAccountNo = self.validate(invoice_vals.get('remittanceAccountNo', None))
+	    remittanceBankName = self.validate(invoice_vals.get('remittanceBankName', None))
+            remittanceExternalRef = self.validate(invoice_vals.get('remittanceExternalRef', None))
+	    remittanceSwiftCode = self.validate(invoice_vals.get('remittanceSwiftCode', None))
+            remittanceFullName = self.validate(invoice_vals.get('remittanceFullName', None))
+	    remittanceIban = self.validate(invoice_vals.get('remittanceIban', None))
+            docNo = self.validate(invoice_vals.get('docNo', None))
+	    companyBU = self.validate(invoice_vals.get('companyBU', None))
+            counterpartyBU = self.validate(invoice_vals.get('counterpartyBU', None))
+	    paymentAccountNo = self.validate(invoice_vals.get('paymentAccountNo', None))
+	    paymentBank = self.validate(invoice_vals.get('paymentBank', None))
+	    paymentBankCode = self.validate(invoice_vals.get('paymentBankCode', None))
+	    lastUserId = self.validate(invoice_vals.get('lastUserId', None))
+            lastModifiedDate = self.validate(invoice_vals.get('lastModifiedDate', None))
+
+	    columns = '(status, trans_no, trans_type, external_ref_id, bill_external_ref, vendor_no, vendor_name, vendor_short_name, vendor_external_ref, vendor_type, vendor_country_code, vendor_cross_ref, vendor_careof, vendor_careof_ref, vendor_careof_country_code, invoice_no, rev_invoice_no, purchaseorder_no, memo, bill_remarks, approval, payment_terms_code, invoice_date, entry_date, act_date, exchangerate_date, remarks, apar_code, currency_amount, currency, exchangerate, base_currency_amount, opr_trans_no, opr_bill_source, remittance_seq, remittance_comp_no, remittance_account_no, remittance_bank_name, remittance_external_ref, remittance_swift_code, remittance_full_name, remittance_iban, doc_no, company_bu, counterparty_bu, payment_account_no, payment_bank, payment_bank_code, last_user_id, last_modified_date, cp_date, create_date, create_uid, write_date, write_uid)'
+
+	    query = "INSERT INTO imos_freight_invoice %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (columns, status, transNo, transType, externalRefId, billExternalRef, vendorNo, vendorName, vendorShortName, vendorExternalRef, vendorType, vendorCountryCode, vendorCrossRef, vendorCareOf, vendorCareOfRef, vendorCareOfCountryCode, invoiceNo, revInvoiceNo, purchaseOrderNo, memo, billRemarks, approval, paymentTermsCode, invoiceDate, entryDate, actDate, exchangeRateDate, remarks, aparCode, currencyAmount, currency, exchangeRate, baseCurrencyAmount, oprTransNo, oprBillSource, remittanceSeq, remittanceCompNo, remittanceAccountNo, remittanceBankName, remittanceExternalRef, remittanceSwiftCode, remittanceFullName, remittanceIban, docNo, companyBU, counterpartyBU, paymentAccountNo, paymentBank, paymentBankCode, lastUserId, lastModifiedDate, cpDate) 
+	     
+
+	    print"=======query========", query
+
+	    cur.execute(query)
+	    temp = cur.fetchall()
+	    print"==========temp=======", temp
 
 
 	    invoiceDetails = invoice_vals.get('invoiceDetails', [])
@@ -315,9 +334,6 @@ class PostgresConnector:
 		    iportCountryCode = itinerary_lines.get('iportCountryCode', None)
 
 		#inv_lines_dict = dict(val for val in inv_lines.iteritems())
-	
-	    print"=======lastModifiedDate======", lastModifiedDate
-
 	    
 	
             query = "INSERT INTO imos_invoice_staging (transaction_no, date_invoice) VALUES ('{}', '{}') RETURNING ID".format(transaction_no, invoice_date)  
