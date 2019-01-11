@@ -140,6 +140,27 @@ def importFreightInvoice():
 	#return "Some Error Occured"
 
 
+@app.route('/v1/importTCOInvoice', methods = ['POST'])
+def importTCOInvoice():
+    rawfile = request.data
+    json_data = dict(request.args)
+    clientId = json_data.get('clientId',False) and json_data.get('clientId',False)[0] or ''
+    if ((clientId and clientId.isspace()) or (clientId not in validClientIds)):
+        return "INVALID CLIENT ID or NO CLIENT ID", 400	
+    transNo = ''
+    invoiceDate = ''
+    #try:
+    if rawfile:  
+    	  invoice_vals  = xmltodict.parse(rawfile)['invoice'] #['xml']['From']
+          #invoice_vals = dict(val for val in res.iteritems())
+	  
+          return PostgresConnector().importTCOInvoice(invoice_vals)
+     #  else:
+	#   return "Some Error Occured"
+    #except:
+	#return "Some Error Occured"
+
+
 
 @app.route('/v1/TestImport', methods = ['POST'])
 def TestImport():
