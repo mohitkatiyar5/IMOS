@@ -128,16 +128,16 @@ def importFreightInvoice():
         return "INVALID CLIENT ID or NO CLIENT ID", 400	
     transNo = ''
     invoiceDate = ''
-    try:
-       if rawfile:  
+    #try:
+    if rawfile:  
     	  invoice_vals  = xmltodict.parse(rawfile)['invoice'] #['xml']['From']
           #invoice_vals = dict(val for val in res.iteritems())
 	  
           return PostgresConnector().importFreightInvoice(invoice_vals)
-       else:
-	   return "Some Error Occured"
-    except:
-	return "Some Error Occured"
+     #  else:
+	#   return "Some Error Occured"
+    #except:
+	#return "Some Error Occured"
 
 
 
