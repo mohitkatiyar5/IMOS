@@ -160,6 +160,27 @@ def importTCOInvoice():
     #except:
 	#return "Some Error Occured"
 
+@app.route('/v1/genericInvoiceImport', methods = ['POST'])
+def genericInvoiceImport():
+    rawfile = request.data
+    json_data = dict(request.args)
+    inv_type = json_data.get('invType',False) and json_data.get('invType',False)[0] or ''
+    clientId = json_data.get('clientId',False) and json_data.get('clientId',False)[0] or ''
+    if ((clientId and clientId.isspace()) or (clientId not in validClientIds)):
+        return "INVALID CLIENT ID or NO CLIENT ID", 400	
+    transNo = ''
+    invoiceDate = ''
+    #try:
+    if rawfile:  
+    	  invoice_vals  = xmltodict.parse(rawfile)['invoice'] #['xml']['From']
+          #invoice_vals = dict(val for val in res.iteritems())
+	  
+          return PostgresConnector().genericInvoiceImport(invoice_vals, inv_type)
+     #  else:
+	#   return "Some Error Occured"
+    #except:
+	#return "Some Error Occured"
+
 
 
 @app.route('/v1/TestImport', methods = ['POST'])
