@@ -844,14 +844,15 @@ class PostgresConnector:
 	    entryDate = self.validate(invoice_vals.get('entryDate', None))
 	    actDate = self.validate(invoice_vals.get('actDate', None))
 	    payMode = self.validate(invoice_vals.get('payMode', None))
+	    bankCode = self.validate(invoice_vals.get('bankCode', None))
             currencyAmount = self.validate(invoice_vals.get('currencyAmount', None))
 	    currency = self.validate(invoice_vals.get('currency', None))
             baseCurrencyAmount = self.validate(invoice_vals.get('baseCurrencyAmount', None))
             
 
-	    col1 = '(invoice_trans_no, entry_date, act_date, pay_mode, currency_amount, currency, base_currency_amount, create_date, create_uid, write_date, write_uid)'
+	    col1 = '(invoice_trans_no, entry_date, act_date, pay_mode, bank_code, currency_amount, currency, base_currency_amount, create_date, create_uid, write_date, write_uid)'
 
-	    qry1 = "INSERT INTO imos_staging_payment %s VALUES (%s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col1, invoiceTransNo, entryDate, actDate, payMode, currencyAmount, currency, baseCurrencyAmount) 
+	    qry1 = "INSERT INTO imos_staging_payment %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col1, invoiceTransNo, entryDate, actDate, payMode, bankCode, currencyAmount, currency, baseCurrencyAmount) 
 	     
 	    cur.execute(qry1)
 	    payment_id = cur.fetchone()[0]
