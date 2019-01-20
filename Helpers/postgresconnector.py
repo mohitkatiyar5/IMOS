@@ -183,6 +183,8 @@ class PostgresConnector:
 	    inv_id = cur.fetchone()[0]
 
 	    invoiceDetails = self.validate(invoice_vals.get('invoiceDetails', []))
+	    if not isinstance(invoiceDetails, list):
+		invoiceDetails = [invoiceDetails]
 	    for inv_lines in invoiceDetails:
 		transNo = self.validate(inv_lines.get('transNo', None))
 	        transType = self.validate(inv_lines.get('transType', None))
@@ -257,6 +259,8 @@ class PostgresConnector:
 		quantity = self.validate(inv_lines.get('quantity', None))
 		baseFreightAmount = self.validate(inv_lines.get('baseFreightAmount', None))
 		BLDate = self.validate(inv_lines.get('BLDate', None))
+		if not isinstance(BLDate, str):
+		   BLDate = 'Null'
 		BLCode = self.validate(inv_lines.get('BLCode', None))
 		cpUnit = self.validate(inv_lines.get('cpUnit', None))
 		consignee = self.validate(inv_lines.get('consignee', None))
@@ -284,12 +288,19 @@ class PostgresConnector:
 		cargoName = self.validate(inv_lines.get('cargoName', None))
 		broker = self.validate(inv_lines.get('broker', None))
 		invoiceCargoInfo = self.validate(inv_lines.get('invoiceCargoInfo', None))
+		if not isinstance(invoiceCargoInfo, dict):
+		   invoiceCargoInfo = {}	
 		cname = self.validate(invoiceCargoInfo.get('name', None))
 		cbroker = self.validate(invoiceCargoInfo.get('broker', None))
 
-
 		port = self.validate(invoiceCargoInfo.get('port', None))
 		cn = 0
+		name1 = 'Null'
+		func1 = 'Null'
+		name2 = 'Null'
+		func2 = 'Null'
+		if not isinstance(port, list):
+		   port = []
 		for port_dict in port:
 		    if cn == 0:
 		       name1 = self.validate(port_dict.get('name1', None))
@@ -320,6 +331,8 @@ class PostgresConnector:
 		line_id = cur.fetchone()[0]
 		
 		itinerary = self.validate(inv_lines.get('itinerary', []))
+		if not isinstance(itinerary, list):
+			itinerary = [itinerary]
 	    	for itinerary_lines in itinerary:
 		    iport = self.validate(itinerary_lines.get('port', None))
 		    iarrival = self.validate(itinerary_lines.get('arrival', None))
@@ -413,6 +426,8 @@ class PostgresConnector:
 	    print"======inv_id=======", inv_id
 
 	    invoiceDetails = self.validate(invoice_vals.get('invoiceDetails', []))
+	    if not isinstance(invoiceDetails, list):
+		invoiceDetails = [invoiceDetails]
 	    for inv_lines in invoiceDetails:
 		transNo = self.validate(inv_lines.get('transNo', None))
 	        transType = self.validate(inv_lines.get('transType', None))
@@ -487,6 +502,8 @@ class PostgresConnector:
 		quantity = self.validate(inv_lines.get('quantity', None))
 		#baseFreightAmount = self.validate(inv_lines.get('baseFreightAmount', None))
 		BLDate = self.validate(inv_lines.get('BLDate1', None)) #BLDate
+		if not isinstance(BLDate, str):
+		   BLDate = 'Null'
 		BLCode = self.validate(inv_lines.get('BLCode', None))
 		cpUnit = self.validate(inv_lines.get('cpUnit', None))
 		consignee = self.validate(inv_lines.get('consignee', None))
@@ -550,6 +567,8 @@ class PostgresConnector:
 		line_id = cur.fetchone()[0]
 		
 		itinerary = self.validate(inv_lines.get('itinerary', []))
+		if not isinstance(itinerary, list):
+			itinerary = [itinerary]
 	    	for itinerary_lines in itinerary:
 		    iport = self.validate(itinerary_lines.get('port', None))
 		    iarrival = self.validate(itinerary_lines.get('arrival', None))
@@ -790,6 +809,8 @@ class PostgresConnector:
 		line_id = cur.fetchone()[0]
 		
 		itinerary = self.validate(inv_lines.get('itinerary', []))
+		if not isinstance(itinerary, list):
+			itinerary = [itinerary]
 	    	for itinerary_lines in itinerary:
 		    iport = self.validate(itinerary_lines.get('port', None))
 		    iarrival = self.validate(itinerary_lines.get('arrival', None))
