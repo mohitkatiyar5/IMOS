@@ -181,6 +181,27 @@ def genericInvoiceImport():
     #except:
 	#return "Some Error Occured"
 
+@app.route('/v1/genericPaymentImport', methods = ['POST'])
+def genericPaymentImport():
+    rawfile = request.data
+    json_data = dict(request.args)
+    payment_type = json_data.get('PaymentType',False) and json_data.get('PaymentType',False)[0] or ''
+    clientId = json_data.get('clientId',False) and json_data.get('clientId',False)[0] or ''
+    if ((clientId and clientId.isspace()) or (clientId not in validClientIds)):
+        return "INVALID CLIENT ID or NO CLIENT ID", 400	
+    transNo = ''
+    invoiceDate = ''
+    #try:
+    if rawfile:  
+    	  payment_vals  = xmltodict.parse(rawfile)['simplePayment'] #['xml']['From']
+          #invoice_vals = dict(val for val in res.iteritems())
+	  
+          return PostgresConnector().genericPaymentImport(payment_vals, payment_type)
+     #  else:
+	#   return "Some Error Occured"
+    #except:
+	#return "Some Error Occured"
+
 
 
 @app.route('/v1/TestImport', methods = ['POST'])

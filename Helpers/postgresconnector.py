@@ -831,6 +831,41 @@ class PostgresConnector:
 	    cur.close()
             return str(e)
 
+
+#-----------------------------------------------------------------------------------------------------
+#genericPaymentImport:
+    def genericPaymentImport(self, invoice_vals, pay_type):
+        try:
+	    if(not self.conn):
+                self.ConnectToDatabase()
+
+            cur = self.conn.cursor()
+	    invoiceTransNo = self.validate(invoice_vals.get('invoiceTransNo', None))
+	    entryDate = self.validate(invoice_vals.get('entryDate', None))
+	    actDate = self.validate(invoice_vals.get('actDate', None))
+	    payMode = self.validate(invoice_vals.get('payMode', None))
+            currencyAmount = self.validate(invoice_vals.get('currencyAmount', None))
+	    currency = self.validate(invoice_vals.get('currency', None))
+            baseCurrencyAmount = self.validate(invoice_vals.get('baseCurrencyAmount', None))
+            
+
+	    col1 = '(invoice_trans_no, entry_date, act_date, pay_mode, currency_amount, currency, base_currency_amount, create_date, create_uid, write_date, write_uid)'
+
+	    qry1 = "INSERT INTO imos_staging_payment %s VALUES (%s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col1, invoiceTransNo, entryDate, actDate, payMode, currencyAmount, currency, baseCurrencyAmount) 
+	     
+	    cur.execute(qry1)
+	    payment_id = cur.fetchone()[0]
+
+            #inv_lines_dict = dict(val for val in inv_lines.iteritems())    
+            #columns = ('id')
+	    #results = map(lambda x: (dict(zip(columns, x))), [inv_id])
+	    res = dtx([{'id': payment_id}], custom_root='ID', attr_type=False)
+	    cur.close()
+	    return Response(res, content_type='application/XML; charset=utf-8')
+        except Exception as e:
+	    cur.close()
+            return str(e)
+
 #importIMOSInvoice:
     def importTCOInvoice1(self, transaction_no, invoice_date):
         try:
