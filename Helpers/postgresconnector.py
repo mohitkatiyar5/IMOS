@@ -867,6 +867,115 @@ class PostgresConnector:
 	    cur.close()
             return str(e)
 
+
+
+#genericVoyageImport:
+    def genericVoyageImport(self, voyage_vals):
+        try:
+	    if(not self.conn):
+                self.ConnectToDatabase()
+
+            cur = self.conn.cursor()
+	    vesselCode = self.validate(invoice_vals.get('vesselCode', None))
+	    vesselName = self.validate(invoice_vals.get('vesselName', None))
+	    vesselType = self.validate(invoice_vals.get('vesselType', None))
+	    vesselTypeCode = self.validate(invoice_vals.get('vesselTypeCode', None))
+            vesselFlag = self.validate(invoice_vals.get('vesselFlag', None))
+	    vesselDWT = self.validate(invoice_vals.get('vesselDWT', None))
+            vesselGRT = self.validate(invoice_vals.get('vesselGRT', None))
+	    vesselNRT = self.validate(invoice_vals.get('vesselNRT', None))
+            vesselYearBuilt = self.validate(invoice_vals.get('vesselYearBuilt', None))
+	    vesselNumberOfHolds = self.validate(invoice_vals.get('vesselNumberOfHolds', None))
+	    vesselNumberOfHatches = self.validate(invoice_vals.get('vesselNumberOfHatches', None))
+	    vesselSatPhoneNumA = self.validate(invoice_vals.get('vesselSatPhoneNumA', None))
+	    vesselSatPhoneNumB = self.validate(invoice_vals.get('vesselSatPhoneNumB', None))
+            vesselSatPhoneNumC = self.validate(invoice_vals.get('vesselSatPhoneNumC', None))
+	    vesselCelularNum = self.validate(invoice_vals.get('vesselCelularNum', None))
+            vesselFax = self.validate(invoice_vals.get('vesselFax', None))
+	    vesselTelex = self.validate(invoice_vals.get('vesselTelex', None))
+            vesselEmail = self.validate(invoice_vals.get('vesselEmail', None))
+	    vesselCallLetters = self.validate(invoice_vals.get('vesselCallLetters', None))
+	    vesselOwner = self.validate(invoice_vals.get('vesselOwner', None))
+	    vesselOperator = self.validate(invoice_vals.get('vesselOperator', None))
+	    vesselPniClub = self.validate(invoice_vals.get('vesselPniClub', None))
+            vesselExternalRef = self.validate(invoice_vals.get('vesselExternalRef', None))
+	    vesselImoNumber = self.validate(invoice_vals.get('vesselImoNumber', None))
+            lastTCIVoy = self.validate(invoice_vals.get('lastTCIVoy', None))
+	    latestTCIVoyNo = self.validate(invoice_vals.get('latestTCIVoyNo', None))
+            voyageNo = self.validate(invoice_vals.get('voyageNo', None))
+	    commenceDateTime = self.validate(invoice_vals.get('commenceDateTime', None))
+	    completeDateTime = self.validate(invoice_vals.get('completeDateTime', None))
+	    voyageStatus = self.validate(invoice_vals.get('voyageStatus', None))
+	    oprType = self.validate(invoice_vals.get('oprType', None))
+            fixtureId = self.validate(invoice_vals.get('fixtureId', None))
+	    fixtureDate = self.validate(invoice_vals.get('fixtureDate', None))
+            chaCoordinator = self.validate(invoice_vals.get('chaCoordinator', None))
+	    oprCoordinator = self.validate(invoice_vals.get('oprCoordinator', None))
+            controller = self.validate(invoice_vals.get('controller', None))
+	    fdManager = self.validate(invoice_vals.get('fdManager', None))
+	    financeCoordinator = self.validate(invoice_vals.get('financeCoordinator', None))
+	    prevStatus = self.validate(invoice_vals.get('prevStatus', None))
+	    tcoFixCode = self.validate(invoice_vals.get('tcoFixCode', None))
+            tciFixCode = self.validate(invoice_vals.get('tciFixCode', None))
+	    externalRef = self.validate(invoice_vals.get('externalRef', None))
+            voyRef = self.validate(invoice_vals.get('voyRef', None))
+	    lob = self.validate(invoice_vals.get('lob', None))
+            lobFull = self.validate(invoice_vals.get('lobFull', None))
+	    company = self.validate(invoice_vals.get('company', None))
+            companyFull = self.validate(invoice_vals.get('companyFull', None))
+	    counterparty = self.validate(invoice_vals.get('counterparty', None))
+	    counterpartyFull = self.validate(invoice_vals.get('counterpartyFull', None))
+	    cpDate = self.validate(invoice_vals.get('cpDate', None))
+	    entryDate = self.validate(invoice_vals.get('entryDate', None))
+            lastUserId = self.validate(invoice_vals.get('lastUserId', None))
+	    lastModifiedDate = self.validate(invoice_vals.get('lastModifiedDate', None))
+
+	    col1 = '(status, trans_no, trans_type, external_ref_id, bill_external_ref, vendor_no, vendor_name, vendor_short_name, vendor_external_ref, vendor_type, vendor_country_code, vendor_cross_ref, vendor_careof, vendor_careof_ref, vendor_careof_country_code, invoice_no, rev_invoice_no, purchaseorder_no, memo, bill_remarks, approval, payment_terms_code, invoice_date, entry_date, act_date, exchangerate_date, remarks, apar_code, currency_amount, currency, exchangerate, base_currency_amount, opr_trans_no, opr_bill_source, remittance_seq, remittance_comp_no, remittance_account_no, remittance_bank_name, remittance_external_ref, remittance_swift_code, remittance_full_name, remittance_iban, doc_no, company_bu, counterparty_bu, payment_account_no, payment_bank, payment_bank_code, last_user_id, last_modified_date, cp_date, due_date, create_date, create_uid, write_date, write_uid)'
+
+	    qry1 = "INSERT INTO imos_invoice_staging %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col1, vesselCode, vesselName, vesselType, vesselTypeCode, vesselFlag, vesselDWT, vesselGRT,vesselNRT, vesselYearBuilt ,vesselNumberOfHolds,vesselNumberOfHatches, vesselSatPhoneNumA, vesselSatPhoneNumB, vesselSatPhoneNumC, vesselCelularNum, vesselFax, vesselTelex, vesselEmail, vesselCallLetters, vesselOwner, vesselOperator, vesselPniClub, vesselExternalRef, vesselImoNumber, lastTCIVoy, latestTCIVoyNo, voyageNo, commenceDateTime, completeDateTime, voyageStatus, oprType, fixtureId, fixtureDate, chaCoordinator, oprCoordinator, controller, fdManager, financeCoordinator, prevStatus, tcoFixCode, tciFixCode, externalRef, voyRef, lob, lobFull, company, companyFull, counterparty, counterpartyFull, cpDate, entryDate, lastUserId, lastModifiedDate) 
+	     
+	    cur.execute(qry1)
+	    voyage_id = cur.fetchone()[0]
+
+	    userProperties = self.validate(invoice_vals.get('userProperties', {}))
+	    userProperty = self.validate(invoice_vals.get('userProperty', []))
+	    if not isinstance(userProperty, list):
+		userProperty = [userProperty]
+	    for upr in userProperty:
+		fieldName = self.validate(upr.get('fieldName', None))
+	        fieldID = self.validate(upr.get('fieldID', None))
+		
+
+	        col2 = '(staging_voyage_id, fieldName, fieldID, create_date, create_uid, write_date, write_uid)'
+
+		qry2 = "INSERT INTO imos_staging_invoice_line %s VALUES (%s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col2, fieldName, fieldID)
+		
+		cur.execute(qry2)
+		line_id = cur.fetchone()[0]
+		
+		itinerary = self.validate(inv_lines.get('itinerary', []))
+		if not isinstance(itinerary, list):
+			itinerary = [itinerary]
+	    	for itinerary_lines in itinerary:
+		    iport = self.validate(itinerary_lines.get('port', None))
+		    iarrival = self.validate(itinerary_lines.get('arrival', None))
+		    ideparture = self.validate(itinerary_lines.get('departure', None))
+		    iportUNCode = self.validate(itinerary_lines.get('portUNCode', None))
+		    iportCountryCode = self.validate(itinerary_lines.get('iportCountryCode', None))
+
+		    qry3 = "INSERT INTO imos_staging_invoice_itinerary (staging_invoice_line_id, port, arrival, departure, port_un_code, port_country_code) VALUES (%s, %s, %s, %s, %s, %s)" % (line_id, iport, iarrival, ideparture, iportUNCode, iportCountryCode)	
+		    cur.execute(qry3)
+
+            #inv_lines_dict = dict(val for val in inv_lines.iteritems())    
+            #columns = ('id')
+	    #results = map(lambda x: (dict(zip(columns, x))), [inv_id])
+	    res = dtx([{'id': inv_id}], custom_root='ID', attr_type=False)
+	    cur.close()
+	    return Response(res, content_type='application/XML; charset=utf-8')
+        except Exception as e:
+	    cur.close()
+            return str(e)
+
 #importIMOSInvoice:
     def importTCOInvoice1(self, transaction_no, invoice_date):
         try:
