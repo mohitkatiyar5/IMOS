@@ -938,7 +938,9 @@ class PostgresConnector:
 	    voyage_id = cur.fetchone()[0]
 
 	    userProperties = self.validate(invoice_vals.get('userProperties', {}))
-	    userProperty = self.validate(invoice_vals.get('userProperty', []))
+	    if not isinstance(userProperties, dict):
+		userProperties = {}
+	    userProperty = self.validate(userProperties.get('userProperty', []))
 	    if not isinstance(userProperty, list):
 		userProperty = [userProperty]
 	    for upr in userProperty:
@@ -953,18 +955,105 @@ class PostgresConnector:
 		cur.execute(qry2)
 		line_id = cur.fetchone()[0]
 		
-		itinerary = self.validate(inv_lines.get('itinerary', []))
-		if not isinstance(itinerary, list):
-			itinerary = [itinerary]
-	    	for itinerary_lines in itinerary:
-		    iport = self.validate(itinerary_lines.get('port', None))
-		    iarrival = self.validate(itinerary_lines.get('arrival', None))
-		    ideparture = self.validate(itinerary_lines.get('departure', None))
-		    iportUNCode = self.validate(itinerary_lines.get('portUNCode', None))
-		    iportCountryCode = self.validate(itinerary_lines.get('iportCountryCode', None))
+	    portcall = self.validate(inv_lines.get('portcall', []))
+	    if not isinstance(portcall, list):
+	       portcall = [portcall]
+	    for pc in portcall:
+		seq = self.validate(pc.get('seq', None))
+		function = self.validate(pc.get('function', None))
+		status = self.validate(pc.get('status', None))
+		portNo = self.validate(pc.get('portNo', None))
+		portName = self.validate(pc.get('portName', None))
+
+		portcallID = self.validate(pc.get('portcallID', None))
+		portCountryCode = self.validate(pc.get('portCountryCode', None))
+		portExternalRef = self.validate(pc.get('portExternalRef', None))
+		portArea = self.validate(pc.get('portArea', None))
+		portRegionCode = self.validate(pc.get('portRegionCode', None))
+
+		portRegion = self.validate(pc.get('portRegion', None))
+		portOcean = self.validate(pc.get('portOcean', None))
+		defaultLocationRef = self.validate(pc.get('defaultLocationRef', None))
+		ETA = self.validate(pc.get('ETA', None))
+		ETALocal = self.validate(pc.get('ETALocal', None))
+
+		cargoHandling = self.validate(pc.get('cargoHandling', {}))
+		if not isinstance(cargoHandling, dict):
+		   cargoHandling = {}	
+		
+		cargoHandlingLine = self.validate(cargoHandling.get('cargoHandlingLine', []))
+		if not isinstance(cargoHandlingLine, list):
+		   cargoHandlingLine = [cargoHandlingLine]
+		for chl in cargoHandlingLine:
+		    fixtureNo = self.validate(chl.get('fixtureNo', None))
+		    vfixcarSeq = self.validate(chl.get('vfixcarSeq', None))
+		    cargoId = self.validate(chl.get('cargoId', None))
+		    cargoGrade = self.validate(chl.get('cargoGrade', None))
+		    commercialId = self.validate(chl.get('commercialId', None))
+		    portcarSeq = self.validate(chl.get('portcarSeq', None))
+		    cpUnit = self.validate(chl.get('cpUnit', None))
+		    cpQty = self.validate(chl.get('cpQty', None))
+		    cpRate = self.validate(chl.get('cpRate', None))
+		    cpRateUnit = self.validate(chl.get('cpRateUnit', None))
+		    blDate = self.validate(chl.get('blDate', None))
+		    if not isinstance(blDate, str):
+			blDate = 'Null'		    
+		    blQty = self.validate(chl.get('blQty', None))
+		    blCode = self.validate(chl.get('blCode', None))
+		    itinSeq = self.validate(chl.get('itinSeq', None))
+		    function = self.validate(chl.get('function', None))
+		    hasTsCargo = self.validate(chl.get('hasTsCargo', None))
+		    berth = self.validate(chl.get('berth', None))
+		    portExp = self.validate(chl.get('portExp', None))
+		    portExpBase = self.validate(chl.get('portExpBase', None))
+		    portExpCurr = self.validate(chl.get('portExpCurr', None))
 
 		    qry3 = "INSERT INTO imos_staging_invoice_itinerary (staging_invoice_line_id, port, arrival, departure, port_un_code, port_country_code) VALUES (%s, %s, %s, %s, %s, %s)" % (line_id, iport, iarrival, ideparture, iportUNCode, iportCountryCode)	
 		    cur.execute(qry3)
+
+		contracts = self.validate(inv_lines.get('contracts', {}))
+	        if not isinstance(contracts, dict):
+	           contracts = {}
+
+		contract = self.validate(contracts.get('contract', []))
+		if not isinstance(contract, list):
+	           contract = [contract]
+	        for con in contract:
+		    contractType = self.validate(con.get('contractType', None))
+		    cargoID = self.validate(con.get('cargoID', None))
+		    coaNo = self.validate(con.get('coaNo', None))
+		    if not isinstance(coaNo, str):
+			coaNo = 'Null'
+		    voyageTCOCode = self.validate(con.get('voyageTCOCode', None))
+		    if not isinstance(voyageTCOCode, str):
+			voyageTCOCode = 'Null'
+			
+		    segment = self.validate(con.get('segment', None))
+		    description = self.validate(con.get('description', None))
+		    charterer = self.validate(con.get('charterer', None))
+		    pool = self.validate(con.get('pool', None))
+		
+		    lob = self.validate(con.get('lob', None))
+		    tradeArea = self.validate(con.get('tradeArea', None))
+		    tradeAreaCode = self.validate(con.get('tradeAreaCode', None))
+		    tradeAreaExternalRef = self.validate(con.get('tradeAreaExternalRef', None))
+
+		    lob = self.validate(con.get('lob', None))
+		    tradeArea = self.validate(con.get('tradeArea', None))
+		    tradeAreaCode = self.validate(con.get('tradeAreaCode', None))
+		    tradeAreaExternalRef = self.validate(con.get('tradeAreaExternalRef', None))
+
+		portcallID = self.validate(pc.get('portcallID', None))
+		portCountryCode = self.validate(pc.get('portCountryCode', None))
+		portExternalRef = self.validate(pc.get('portExternalRef', None))
+		portArea = self.validate(pc.get('portArea', None))
+		portRegionCode = self.validate(pc.get('portRegionCode', None))
+
+		portRegion = self.validate(pc.get('portRegion', None))
+		portOcean = self.validate(pc.get('portOcean', None))
+		defaultLocationRef = self.validate(pc.get('defaultLocationRef', None))
+		ETA = self.validate(pc.get('ETA', None))
+		ETALocal = self.validate(pc.get('ETALocal', None))
 
             #inv_lines_dict = dict(val for val in inv_lines.iteritems())    
             #columns = ('id')
