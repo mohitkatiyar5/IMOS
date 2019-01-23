@@ -977,6 +977,9 @@ class PostgresConnector:
 		ETA = self.validate(pc.get('ETA', None))
 		ETALocal = self.validate(pc.get('ETALocal', None))
 
+		qry3 = "INSERT INTO imos_staging_invoice_itinerary (staging_invoice_line_id, port, arrival, departure, port_un_code, port_country_code) VALUES (%s, %s, %s, %s, %s, %s)" % (line_id, iport, iarrival, ideparture, iportUNCode, iportCountryCode)	
+		cur.execute(qry3)
+
 		cargoHandling = self.validate(pc.get('cargoHandling', {}))
 		if not isinstance(cargoHandling, dict):
 		   cargoHandling = {}	
@@ -1008,8 +1011,8 @@ class PostgresConnector:
 		    portExpBase = self.validate(chl.get('portExpBase', None))
 		    portExpCurr = self.validate(chl.get('portExpCurr', None))
 
-		    qry3 = "INSERT INTO imos_staging_invoice_itinerary (staging_invoice_line_id, port, arrival, departure, port_un_code, port_country_code) VALUES (%s, %s, %s, %s, %s, %s)" % (line_id, iport, iarrival, ideparture, iportUNCode, iportCountryCode)	
-		    cur.execute(qry3)
+		    qry4 = "INSERT INTO imos_staging_invoice_itinerary (staging_invoice_line_id, port, arrival, departure, port_un_code, port_country_code) VALUES (%s, %s, %s, %s, %s, %s)" % (line_id, iport, iarrival, ideparture, iportUNCode, iportCountryCode)	
+		    cur.execute(qry4)
 
 		contracts = self.validate(inv_lines.get('contracts', {}))
 	        if not isinstance(contracts, dict):
@@ -1038,22 +1041,69 @@ class PostgresConnector:
 		    tradeAreaCode = self.validate(con.get('tradeAreaCode', None))
 		    tradeAreaExternalRef = self.validate(con.get('tradeAreaExternalRef', None))
 
-		    lob = self.validate(con.get('lob', None))
-		    tradeArea = self.validate(con.get('tradeArea', None))
-		    tradeAreaCode = self.validate(con.get('tradeAreaCode', None))
-		    tradeAreaExternalRef = self.validate(con.get('tradeAreaExternalRef', None))
+		    reference = self.validate(con.get('reference', None))
+		    vesselCode = self.validate(con.get('vesselCode', None))
+		    voyageNo = self.validate(con.get('voyageNo', None))
+		    cargoGrade = self.validate(con.get('cargoGrade', None))
+		    cargoRefNo = self.validate(con.get('cargoRefNo', None))
+		    cargoVesselNumber = self.validate(con.get('cargoVesselNumber', None))
+		    qry5 = "INSERT INTO imos_staging_invoice_itinerary (staging_invoice_line_id, port, arrival, departure, port_un_code, port_country_code) VALUES (%s, %s, %s, %s, %s, %s)" % (line_id, iport, iarrival, ideparture, iportUNCode, iportCountryCode)	
+		    cur.execute(qry5)
 
-		portcallID = self.validate(pc.get('portcallID', None))
-		portCountryCode = self.validate(pc.get('portCountryCode', None))
-		portExternalRef = self.validate(pc.get('portExternalRef', None))
-		portArea = self.validate(pc.get('portArea', None))
-		portRegionCode = self.validate(pc.get('portRegionCode', None))
+		bunkerOnBoard = self.validate(inv_lines.get('bunkerOnBoard', {}))
+	        if not isinstance(bunkerOnBoard, dict):
+	           bunkerOnBoard = {}
 
-		portRegion = self.validate(pc.get('portRegion', None))
-		portOcean = self.validate(pc.get('portOcean', None))
-		defaultLocationRef = self.validate(pc.get('defaultLocationRef', None))
-		ETA = self.validate(pc.get('ETA', None))
-		ETALocal = self.validate(pc.get('ETALocal', None))
+		fuels = self.validate(bunkerOnBoard.get('fuels', {}))
+		if not isinstance(fuels, dict):
+	           fuels = {}
+		fuel = self.validate(fuels.get('fuel', []))
+		if not isinstance(fuel, list):
+		   fuel = [fuel]
+	        for f in fuel:
+		    type = self.validate(f.get('type', None))
+		    qty = self.validate(f.get('qty', None))
+		    prc = self.validate(f.get('prc', None))
+		
+		    qry6 = "INSERT INTO imos_staging_invoice_itinerary (staging_invoice_line_id, port, arrival, departure, port_un_code, port_country_code) VALUES (%s, %s, %s, %s, %s, %s)" % (line_id, iport, iarrival, ideparture, iportUNCode, iportCountryCode)	
+		    cur.execute(qry6)
+
+		voyageBunkers = self.validate(inv_lines.get('voyageBunkers', {}))
+	        if not isinstance(voyageBunkers, dict):
+	           voyageBunkers = {}
+
+		bunkerInfo = self.validate(contracts.get('bunkerInfo', []))
+		if not isinstance(bunkerInfo, list):
+	           bunkerInfo = [bunkerInfo]
+	        for bi in bunkerInfo:
+		    fuelType = self.validate(bi.get('fuelType', None))
+		    ttlConsQty = self.validate(bi.get('ttlConsQty', None))
+		    initQty = self.validate(bi.get('initQty', None))
+		    endQty = self.validate(bi.get('endQty', None))
+	  		
+		    qry7 = "INSERT INTO imos_staging_invoice_itinerary (staging_invoice_line_id, port, arrival, departure, port_un_code, port_country_code) VALUES (%s, %s, %s, %s, %s, %s)" % (line_id, iport, iarrival, ideparture, iportUNCode, iportCountryCode)	
+		    cur.execute(qry7)
+
+
+		bunkerPlan = self.validate(inv_lines.get('bunkerPlan', {}))
+	        if not isinstance(bunkerPlan, dict):
+	           bunkerPlan = {}
+
+		ports = self.validate(bunkerPlan.get('ports', {}))
+	        if not isinstance(ports, dict):
+	           ports = {}
+
+		port = self.validate(ports.get('port', []))
+		if not isinstance(port, list):
+	           port = [port]
+	        for p in port:
+		    portName = self.validate(p.get('portName', None))
+		    portSeq = self.validate(p.get('portSeq', None))
+		    etaGmt = self.validate(p.get('etaGmt', None))
+		    liftings = self.validate(p.get('liftings', None))
+		      		
+		    qry8 = "INSERT INTO imos_staging_invoice_itinerary (staging_invoice_line_id, port, arrival, departure, port_un_code, port_country_code) VALUES (%s, %s, %s, %s, %s, %s)" % (line_id, iport, iarrival, ideparture, iportUNCode, iportCountryCode)	
+		    cur.execute(qry8)
 
             #inv_lines_dict = dict(val for val in inv_lines.iteritems())    
             #columns = ('id')
