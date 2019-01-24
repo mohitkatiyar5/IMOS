@@ -939,7 +939,6 @@ class PostgresConnector:
 	     
 	    cur.execute(qry1)
 	    voyage_id = cur.fetchone()[0]
-	    print"======voyage_id====", voyage_id
 
 	    userProperties = self.validate(voyage_vals.get('userProperties', {}))
 	    if not isinstance(userProperties, dict):
@@ -958,7 +957,6 @@ class PostgresConnector:
 		
 		cur.execute(qry2)
 		user_property_id = cur.fetchone()[0]
-		print"========user_property_id========", user_property_id
 		
 	    portcall = self.validate(voyage_vals.get('portcall', []))
 	    if not isinstance(portcall, list):
@@ -989,7 +987,6 @@ class PostgresConnector:
 		qry3 = "INSERT INTO imos_voyage_staging_port_call %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col3, voyage_id, seq, function, status, portNo, portName, portcallID, portCountryCode, portExternalRef, portArea, portRegionCode, portRegion, portOcean, defaultLocationRef, ETA, ETALocal, ETD)	
 		cur.execute(qry3)
 		port_call_id = cur.fetchone()[0]
-		print"====port_call_id========", port_call_id
 
 		cargoHandling = self.validate(pc.get('cargoHandling', {}))
 		if not isinstance(cargoHandling, dict):
@@ -1029,7 +1026,6 @@ class PostgresConnector:
 		    qry4 = "INSERT INTO imos_voyage_staging_cargo_handling %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col4, port_call_id, fixtureNo, vfixcarSeq, cargoId, cargoGrade, commercialId, portcarSeq, cpUnit, cpQty, cpRate, cpRateUnit, blDate, blQty, blCode, itinSeq, function, hasTsCargo, berth, portExp, portExpBase, portExpCurr)	
 		    cur.execute(qry4)
 		    cargo_handling_id = cur.fetchone()[0]
-		    print"==========cargo_handling_id=======", cargo_handling_id
 
 	    contracts = self.validate(voyage_vals.get('contracts', {}))
             if not isinstance(contracts, dict):
@@ -1070,7 +1066,6 @@ class PostgresConnector:
 	        qry5 = "INSERT INTO imos_voyage_staging_contracts %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col5, voyage_id, contractType, cargoID, coaNo, voyageTCOCode, segment, description, charterer, pool, lob, tradeArea, tradeAreaCode, tradeAreaExternalRef, reference, vesselCode, voyageNo, cargoGrade, cargoRefNo, cargoVesselNumber)	
 	        cur.execute(qry5)
 	        contract_id = cur.fetchone()[0]
-	        print"======contract_id======", contract_id
 
 	        bunkerOnBoard = self.validate(voyage_vals.get('bunkerOnBoard', {}))
                 if not isinstance(bunkerOnBoard, dict):
@@ -1092,7 +1087,6 @@ class PostgresConnector:
 	        qry6 = "INSERT INTO imos_voyage_staging_fuels %s VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col6, voyage_id, type, qty, prc)	
  	        cur.execute(qry6)
 	        fuel_id = cur.fetchone()[0]
-	        print"==========fuel_id=======", fuel_id
 
 	        voyageBunkers = self.validate(voyage_vals.get('voyageBunkers', {}))
                 if not isinstance(voyageBunkers, dict):
@@ -1101,9 +1095,8 @@ class PostgresConnector:
 	        bunkerInfo = self.validate(voyageBunkers.get('bunkerInfo', []))
 	        if not isinstance(bunkerInfo, list):
                    bunkerInfo = [bunkerInfo]
-	        print"====bunkerInfo========", bunkerInfo
+
                 for bi in bunkerInfo:
-	            print"========bi=======", bi
 	            fuelType = self.validate(bi.get('fuelType', None))
 	            ttlConsQty = self.validate(bi.get('ttlConsQty', None))
 	            initQty = self.validate(bi.get('initQty', None))
@@ -1114,8 +1107,6 @@ class PostgresConnector:
 	        qry7 = "INSERT INTO imos_voyage_staging_bunker %s VALUES (%s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col7, voyage_id, fuelType, ttlConsQty, initQty, endQty)	
 	        cur.execute(qry7)
 	        bunker_id  = cur.fetchone()[0]
-	        print"=======bunker_id=====", bunker_id
-
 
 	        bunkerPlan = self.validate(voyage_vals.get('bunkerPlan', {}))
                 if not isinstance(bunkerPlan, dict):
@@ -1140,7 +1131,6 @@ class PostgresConnector:
 	        qry8 = "INSERT INTO imos_voyage_staging_ports %s VALUES (%s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col8, voyage_id, portName, portSeq, etaGmt, etdGmt, liftings)	
 	        cur.execute(qry8)
 	        port_id = cur.fetchone()[0]
-	        print"======port_id=====", port_id
 
             #inv_lines_dict = dict(val for val in inv_lines.iteritems())    
             #columns = ('id')
