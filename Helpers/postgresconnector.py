@@ -599,7 +599,7 @@ class PostgresConnector:
                 self.ConnectToDatabase()
 
             cur = self.conn.cursor()
-	    inv_type = inv_type or 'Null'
+	    inv_type = self.validate(inv_type or 'Null')
 	    status = self.validate(invoice_vals.get('status', None))
 	    transNo = self.validate(invoice_vals.get('transNo', None))
 	    transType = self.validate(invoice_vals.get('transType', None))
@@ -841,7 +841,7 @@ class PostgresConnector:
         try:
 	    if(not self.conn):
                 self.ConnectToDatabase()
-	    pay_type = pay_type  or 'Null'
+	    pay_type = self.validate(pay_type  or 'Null')
             cur = self.conn.cursor()
 	    invoiceTransNo = self.validate(invoice_vals.get('invoiceTransNo', None))
 	    entryDate = self.validate(invoice_vals.get('entryDate', None))
