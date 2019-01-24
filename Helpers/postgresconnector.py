@@ -105,6 +105,8 @@ class PostgresConnector:
 
     def validate(self, value):
 	print"========value=======", value
+	if (isinstance(value, list) or isinstance(value, tuple) or isinstance(value, dict)):
+	      return value 
 	if value:
 	   if not (isinstance(value, list) or isinstance(value, tuple) or isinstance(value, dict)):
 	      value = value.encode('utf8') 
@@ -931,12 +933,13 @@ class PostgresConnector:
             lastUserId = self.validate(voyage_vals.get('lastUserId', None))
 	    lastModifiedDate = self.validate(voyage_vals.get('lastModifiedDate', None))
 
-	    col1 = '(vessel_code, vessel_name, vessel_type, vessel_type_code, vessel_flag, vessel_dwt, vessel_grt, vessel_nrt, vessel_year_built, vessel_number_of_holds, vessel_number_of_hatches, vessel_sat_phone_num_a, vessel_sat_phone_num_b, vessel_sat_phone_num_c,	vessel_celular_num, vessel_fax, vessel_telex, vessel_email, vessel_call_letters, vessel_owner, vessel_operator, vessel_pni_club,	vessel_external_ref, vessel_imo_number, last_tci_voy, latest_tci_Voy_no, voyage_no, commence_date_time, complete_date_time, voyage_status,	opr_type, fixture_id, fixture_date, cha_coordinator, opr_coordinator, alt_opr_coordinator, controller, fd_manager, finance_coordinator,	prev_status, tco_fix_code, tci_fix_code, external_ref, voy_ref, lob, lob_full, company, company_full, counterparty, counterparty_full, cp_date, entry_date, last_user_id, last_modified_date, create_uid, create_date, write_uid, write_date)'
+	    col1 = '(vessel_code, vessel_name, vessel_type, vessel_type_code, vessel_flag, vessel_dwt, vessel_grt, vessel_nrt, vessel_year_built, vessel_number_of_holds, vessel_number_of_hatches, vessel_sat_phone_num_a, vessel_sat_phone_num_b, vessel_sat_phone_num_c,	vessel_celular_num, vessel_fax, vessel_telex, vessel_email, vessel_call_letters, vessel_owner, vessel_operator, vessel_pni_club,	vessel_external_ref, vessel_imo_number, last_tci_voy, "latest_tci_Voy_no", voyage_no, commence_date_time, complete_date_time, voyage_status,	opr_type, fixture_id, fixture_date, cha_coordinator, opr_coordinator, alt_opr_coordinator, controller, fd_manager, finance_coordinator,	prev_status, tco_fix_code, tci_fix_code, external_ref, voy_ref, lob, lob_full, company, company_full, counterparty, counterparty_full, cp_date, entry_date, last_user_id, last_modified_date, create_date, create_uid, write_date, write_uid)'
 
-	    qry1 = "INSERT INTO imos_voyage_staging %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col1, vesselCode, vesselName, vesselType, vesselTypeCode, vesselFlag, vesselDWT, vesselGRT,vesselNRT, vesselYearBuilt ,vesselNumberOfHolds,vesselNumberOfHatches, vesselSatPhoneNumA, vesselSatPhoneNumB, vesselSatPhoneNumC, vesselCelularNum, vesselFax, vesselTelex, vesselEmail, vesselCallLetters, vesselOwner, vesselOperator, vesselPniClub, vesselExternalRef, vesselImoNumber, lastTCIVoy, latestTCIVoyNo, voyageNo, commenceDateTime, completeDateTime, voyageStatus, oprType, fixtureId, fixtureDate, chaCoordinator, oprCoordinator, altOprCoordinator, controller, fdManager, financeCoordinator, prevStatus, tcoFixCode, tciFixCode, externalRef, voyRef, lob, lobFull, company, companyFull, counterparty, counterpartyFull, cpDate, entryDate, lastUserId, lastModifiedDate) 
+	    qry1 = "INSERT INTO imos_voyage_staging %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col1, vesselCode, vesselName, vesselType, vesselTypeCode, vesselFlag, vesselDWT, vesselGRT,vesselNRT, vesselYearBuilt ,vesselNumberOfHolds,vesselNumberOfHatches, vesselSatPhoneNumA, vesselSatPhoneNumB, vesselSatPhoneNumC, vesselCelularNum, vesselFax, vesselTelex, vesselEmail, vesselCallLetters, vesselOwner, vesselOperator, vesselPniClub, vesselExternalRef, vesselImoNumber, lastTCIVoy, latestTCIVoyNo, voyageNo, commenceDateTime, completeDateTime, voyageStatus, oprType, fixtureId, fixtureDate, chaCoordinator, oprCoordinator, altOprCoordinator, controller, fdManager, financeCoordinator, prevStatus, tcoFixCode, tciFixCode, externalRef, voyRef, lob, lobFull, company, companyFull, counterparty, counterpartyFull, cpDate, entryDate, lastUserId, lastModifiedDate) 
 	     
 	    cur.execute(qry1)
 	    voyage_id = cur.fetchone()[0]
+	    print"======voyage_id====", voyage_id
 
 	    userProperties = self.validate(voyage_vals.get('userProperties', {}))
 	    if not isinstance(userProperties, dict):
@@ -949,7 +952,7 @@ class PostgresConnector:
 	        fieldID = self.validate(upr.get('fieldID', None))
 		value = self.validate(upr.get('value', None))
 		
-	        col2 = '(staging_user_voyage_id, field_name, field_id, value, create_date, create_uid, write_date, write_uid)'
+	        col2 = '(stage_user_voyage_id, field_name, field_id, value, create_date, create_uid, write_date, write_uid)'
 
 		qry2 = "INSERT INTO imos_voyage_staging_user_properties %s VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col2, voyage_id, fieldName, fieldID, value)
 		
@@ -978,20 +981,25 @@ class PostgresConnector:
 		defaultLocationRef = self.validate(pc.get('defaultLocationRef', None))
 		ETA = self.validate(pc.get('ETA', None))
 		ETALocal = self.validate(pc.get('ETALocal', None))
+		ETD = self.validate(pc.get('ETA', None))
+		ETDLocal = self.validate(pc.get('ETALocal', None))
 
-		col3 = '(stage_portcall_voyage_id, seq, function, status, port_no, port_name, port_call_id, port_country_code, port_external_ref, port_area,	port_region_code, port_region, port_ocean, default_location_ref, eta, eta_local, etd, create_uid, create_date, write_uid, write_date)'
+		col3 = '(stage_portcall_voyage_id, seq, function, status, port_no, port_name, port_call_id, port_country_code, port_external_ref, port_area,	port_region_code, port_region, port_ocean, default_location_ref, eta, eta_local, etd, create_date, create_uid, write_date, write_uid)'
 
-		qry3 = "INSERT INTO imos_voyage_staging_port_call %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col3, voyage_id, seq, function, status, portNo, portcallID, portCountryCode, portExternalRef, portArea, portRegionCode, portRegion, portOcean, defaultLocationRef, ETA, ETALocal)	
+		qry3 = "INSERT INTO imos_voyage_staging_port_call %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col3, voyage_id, seq, function, status, portNo, portName, portcallID, portCountryCode, portExternalRef, portArea, portRegionCode, portRegion, portOcean, defaultLocationRef, ETA, ETALocal, ETD)	
 		cur.execute(qry3)
 		port_call_id = cur.fetchone()[0]
+		print"====port_call_id========", port_call_id
 
 		cargoHandling = self.validate(pc.get('cargoHandling', {}))
 		if not isinstance(cargoHandling, dict):
 		   cargoHandling = {}	
-		
+
 		cargoHandlingLine = self.validate(cargoHandling.get('cargoHandlingLine', []))
+
 		if not isinstance(cargoHandlingLine, list):
 		   cargoHandlingLine = [cargoHandlingLine]
+
 		for chl in cargoHandlingLine:
 		    fixtureNo = self.validate(chl.get('fixtureNo', None))
 		    vfixcarSeq = self.validate(chl.get('vfixcarSeq', None))
@@ -1016,121 +1024,123 @@ class PostgresConnector:
 		    portExpBase = self.validate(chl.get('portExpBase', None))
 		    portExpCurr = self.validate(chl.get('portExpCurr', None))
 
-		    col4 = '(stage_cargo_handling_voyage_id, fixture_no, vfixcar_seq, cargo_id, cargo_grade, commercial_id, port_car_seq, cp_unit, cp_qty, cp_rate, cp_rate_unit, bl_date, bl_qty, bl_code, itin_seq, function, has_ts_cargo, berth, port_exp, port_exp_base, port_exp_curr, create_uid, create_date, write_uid, write_date)'
+		    col4 = '(stage_cargo_handling_voyage_id, fixture_no, vfixcar_seq, cargo_id, cargo_grade, commercial_id, port_car_seq, cp_unit, cp_qty, cp_rate, cp_rate_unit, bl_date, bl_qty, bl_code, itin_seq, function, has_ts_cargo, berth, port_exp, port_exp_base, port_exp_curr, create_date, create_uid,  write_date, write_uid)'
 
 		    qry4 = "INSERT INTO imos_voyage_staging_cargo_handling %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col4, port_call_id, fixtureNo, vfixcarSeq, cargoId, cargoGrade, commercialId, portcarSeq, cpUnit, cpQty, cpRate, cpRateUnit, blDate, blQty, blCode, itinSeq, function, hasTsCargo, berth, portExp, portExpBase, portExpCurr)	
 		    cur.execute(qry4)
 		    cargo_handling_id = cur.fetchone()[0]
 		    print"==========cargo_handling_id=======", cargo_handling_id
 
-		contracts = self.validate(voyage_vals.get('contracts', {}))
-	        if not isinstance(contracts, dict):
-	           contracts = {}
+	    contracts = self.validate(voyage_vals.get('contracts', {}))
+            if not isinstance(contracts, dict):
+               contracts = {}
 
-		contract = self.validate(contracts.get('contract', []))
-		if not isinstance(contract, list):
-	           contract = [contract]
-	        for con in contract:
-		    contractType = self.validate(con.get('contractType', None))
-		    cargoID = self.validate(con.get('cargoID', None))
-		    coaNo = self.validate(con.get('coaNo', None))
-		    if not isinstance(coaNo, str):
-			coaNo = 'Null'
-		    voyageTCOCode = self.validate(con.get('voyageTCOCode', None))
-		    if not isinstance(voyageTCOCode, str):
-			voyageTCOCode = 'Null'
-			
-		    segment = self.validate(con.get('segment', None))
-		    description = self.validate(con.get('description', None))
-		    charterer = self.validate(con.get('charterer', None))
-		    pool = self.validate(con.get('pool', None))
+	    contract = self.validate(contracts.get('contract', []))
+	    if not isinstance(contract, list):
+               contract = [contract]
+            for con in contract:
+	        contractType = self.validate(con.get('contractType', None))
+	        cargoID = self.validate(con.get('cargoID', None))
+	        coaNo = self.validate(con.get('coaNo', None))
+	        if not isinstance(coaNo, str):
+		   coaNo = 'Null'
+	        voyageTCOCode = self.validate(con.get('voyageTCOCode', None))
+	        if not isinstance(voyageTCOCode, str):
+		   voyageTCOCode = 'Null'
 		
-		    lob = self.validate(con.get('lob', None))
-		    tradeArea = self.validate(con.get('tradeArea', None))
-		    tradeAreaCode = self.validate(con.get('tradeAreaCode', None))
-		    tradeAreaExternalRef = self.validate(con.get('tradeAreaExternalRef', None))
+	        segment = self.validate(con.get('segment', None))
+	        description = self.validate(con.get('description', None))
+	        charterer = self.validate(con.get('charterer', None))
+	        pool = self.validate(con.get('pool', None))
+	
+	        lob = self.validate(con.get('lob', None))
+	        tradeArea = self.validate(con.get('tradeArea', None))
+	        tradeAreaCode = self.validate(con.get('tradeAreaCode', None))
+	        tradeAreaExternalRef = self.validate(con.get('tradeAreaExternalRef', None))
 
-		    reference = self.validate(con.get('reference', None))
-		    vesselCode = self.validate(con.get('vesselCode', None))
-		    voyageNo = self.validate(con.get('voyageNo', None))
-		    cargoGrade = self.validate(con.get('cargoGrade', None))
-		    cargoRefNo = self.validate(con.get('cargoRefNo', None))
-		    cargoVesselNumber = self.validate(con.get('cargoVesselNumber', None))
+	        reference = self.validate(con.get('reference', None))
+	        vesselCode = self.validate(con.get('vesselCode', None))
+	        voyageNo = self.validate(con.get('voyageNo', None))
+	        cargoGrade = self.validate(con.get('cargoGrade', None))
+	        cargoRefNo = self.validate(con.get('cargoRefNo', None))
+	        cargoVesselNumber = self.validate(con.get('cargoVesselNumber', None))
 
-		    col5 = '(stage_contract_voyage_id, contract_type, cargo_id, coa_no, voyage_tco_code, segment, description, charterer, pool_id, lob, trade_area, trade_area_code, trade_area_external_ref, reference, vessel_code, voyage_no, cargo_grade, cargo_ref_no, cargo_vessel_number, create_uid, create_date, write_uid, write_date)'
+	        col5 = '(stage_contract_voyage_id, contract_type, cargo_id, coa_no, voyage_tco_code, segment, description, charterer, pool_id, lob, trade_area, trade_area_code, trade_area_external_ref, reference, vessel_code, voyage_no, cargo_grade, cargo_ref_no, cargo_vessel_number, create_date, create_uid, write_date, write_uid)'
 
-		    qry5 = "INSERT INTO imos_voyage_staging_contracts %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col5, voyage_id, segment, description, charterer, pool, lob, tradeArea, tradeAreaCode, tradeAreaExternalRef, reference, vesselCode, voyageNo, cargoGrade, cargoRefNo, cargoVesselNumber)	
-		    cur.execute(qry5)
-		    contract_id = cur.fetchone()[0]
-		    print"======contract_id======", contract_id
+	        qry5 = "INSERT INTO imos_voyage_staging_contracts %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col5, voyage_id, contractType, cargoID, coaNo, voyageTCOCode, segment, description, charterer, pool, lob, tradeArea, tradeAreaCode, tradeAreaExternalRef, reference, vesselCode, voyageNo, cargoGrade, cargoRefNo, cargoVesselNumber)	
+	        cur.execute(qry5)
+	        contract_id = cur.fetchone()[0]
+	        print"======contract_id======", contract_id
 
-		bunkerOnBoard = self.validate(voyage_vals.get('bunkerOnBoard', {}))
-	        if not isinstance(bunkerOnBoard, dict):
-	           bunkerOnBoard = {}
+	        bunkerOnBoard = self.validate(voyage_vals.get('bunkerOnBoard', {}))
+                if not isinstance(bunkerOnBoard, dict):
+                   bunkerOnBoard = {}
 
-		fuels = self.validate(bunkerOnBoard.get('fuels', {}))
-		if not isinstance(fuels, dict):
-	           fuels = {}
-		fuel = self.validate(fuels.get('fuel', []))
-		if not isinstance(fuel, list):
-		   fuel = [fuel]
-	        for f in fuel:
-		    type = self.validate(f.get('type', None))
-		    qty = self.validate(f.get('qty', None))
-		    prc = self.validate(f.get('prc', None))
-		 
-		    col6 = '(stage_fuel_voyage_id, type, qty, prc, create_uid, create_date, write_uid, write_date)'
+	        fuels = self.validate(bunkerOnBoard.get('fuels', {}))
+	        if not isinstance(fuels, dict):
+                   fuels = {}
+	        fuel = self.validate(fuels.get('fuel', []))
+	        if not isinstance(fuel, list):
+	           fuel = [fuel]
+                for f in fuel:
+	            type = self.validate(f.get('type', None))
+	            qty = self.validate(f.get('qty', None))
+	            prc = self.validate(f.get('prc', None))
+	 
+	        col6 = '(stage_fuel_voyage_id, type, qty, prc, create_date, create_uid, write_date, write_uid)'
 
-		    qry6 = "INSERT INTO imos_voyage_staging_fuels %s VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col6, voyage_id, type, qty, prc)	
-	 	    cur.execute(qry6)
-		    fuel_id = cur.fetchone()[0]
-		    print"==========fuel_id=======", fuel_id
+	        qry6 = "INSERT INTO imos_voyage_staging_fuels %s VALUES (%s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col6, voyage_id, type, qty, prc)	
+ 	        cur.execute(qry6)
+	        fuel_id = cur.fetchone()[0]
+	        print"==========fuel_id=======", fuel_id
 
-		voyageBunkers = self.validate(voyage_vals.get('voyageBunkers', {}))
-	        if not isinstance(voyageBunkers, dict):
-	           voyageBunkers = {}
+	        voyageBunkers = self.validate(voyage_vals.get('voyageBunkers', {}))
+                if not isinstance(voyageBunkers, dict):
+                   voyageBunkers = {}
 
-		bunkerInfo = self.validate(contracts.get('bunkerInfo', []))
-		if not isinstance(bunkerInfo, list):
-	           bunkerInfo = [bunkerInfo]
-	        for bi in bunkerInfo:
-		    fuelType = self.validate(bi.get('fuelType', None))
-		    ttlConsQty = self.validate(bi.get('ttlConsQty', None))
-		    initQty = self.validate(bi.get('initQty', None))
-		    endQty = self.validate(bi.get('endQty', None))
+	        bunkerInfo = self.validate(voyageBunkers.get('bunkerInfo', []))
+	        if not isinstance(bunkerInfo, list):
+                   bunkerInfo = [bunkerInfo]
+	        print"====bunkerInfo========", bunkerInfo
+                for bi in bunkerInfo:
+	            print"========bi=======", bi
+	            fuelType = self.validate(bi.get('fuelType', None))
+	            ttlConsQty = self.validate(bi.get('ttlConsQty', None))
+	            initQty = self.validate(bi.get('initQty', None))
+	            endQty = self.validate(bi.get('endQty', None))
 
-	  	    col7 = '(stage_bunker_voyage_id, fuel_type, ttl_cons_qty, init_qty, end_qty, create_uid, create_date, write_uid, write_date)'
+  	        col7 = '(stage_bunker_voyage_id, fuel_type, ttl_cons_qty, init_qty, end_qty, create_date, create_uid, write_date, write_uid)'
 
-		    qry7 = "INSERT INTO imos_voyage_staging_bunker %s VALUES (%s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col7, voyage_id, fuelType, ttlConsQty, initQty, endQty)	
-		    cur.execute(qry7)
-		    bunker_id  = cur.fetchone()[0]
-		    print"=======bunker_id=====", bunker_id
+	        qry7 = "INSERT INTO imos_voyage_staging_bunker %s VALUES (%s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col7, voyage_id, fuelType, ttlConsQty, initQty, endQty)	
+	        cur.execute(qry7)
+	        bunker_id  = cur.fetchone()[0]
+	        print"=======bunker_id=====", bunker_id
 
 
-		bunkerPlan = self.validate(voyage_vals.get('bunkerPlan', {}))
-	        if not isinstance(bunkerPlan, dict):
-	           bunkerPlan = {}
+	        bunkerPlan = self.validate(voyage_vals.get('bunkerPlan', {}))
+                if not isinstance(bunkerPlan, dict):
+                   bunkerPlan = {}
 
-		ports = self.validate(bunkerPlan.get('ports', {}))
-	        if not isinstance(ports, dict):
-	           ports = {}
+	        ports = self.validate(bunkerPlan.get('ports', {}))
+                if not isinstance(ports, dict):
+                   ports = {}
 
-		port = self.validate(ports.get('port', []))
-		if not isinstance(port, list):
-	           port = [port]
-	        for p in port:
-		    portName = self.validate(p.get('portName', None))
-		    portSeq = self.validate(p.get('portSeq', None))
-		    etaGmt = self.validate(p.get('etaGmt', None))
-		    etdGmt = self.validate(p.get('etdGmt', None))
-		    liftings = self.validate(p.get('liftings', None))
+	        port = self.validate(ports.get('port', []))
+	        if not isinstance(port, list):
+                   port = [port]
+                for p in port:
+	            portName = self.validate(p.get('portName', None))
+	            portSeq = self.validate(p.get('portSeq', None))
+	            etaGmt = self.validate(p.get('etaGmt', None))
+	            etdGmt = self.validate(p.get('etdGmt', None))
+	            liftings = self.validate(p.get('liftings', None))
 
-		    col8 = '(stage_ports_voyage_id, port_name, port_seq, eta_gmt, etd_gmt, liftings, create_uid, create_date, write_uid, write_dat)'
-		      		
-		    qry8 = "INSERT INTO imos_voyage_staging_ports %s VALUES (%s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col8, voyage_id, portName, portSeq, etaGmt, etdGmt, liftings)	
-		    cur.execute(qry8)
-		    port_id = cur.fetchone()[0]
-		    print"======port_id=====", port_id
+	        col8 = '(stage_ports_voyage_id, port_name, port_seq, eta_gmt, etd_gmt, liftings, create_date, create_uid, write_date, write_uid)'
+	      		
+	        qry8 = "INSERT INTO imos_voyage_staging_ports %s VALUES (%s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col8, voyage_id, portName, portSeq, etaGmt, etdGmt, liftings)	
+	        cur.execute(qry8)
+	        port_id = cur.fetchone()[0]
+	        print"======port_id=====", port_id
 
             #inv_lines_dict = dict(val for val in inv_lines.iteritems())    
             #columns = ('id')
