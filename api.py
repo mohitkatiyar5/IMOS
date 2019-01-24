@@ -213,7 +213,7 @@ def genericVoyageImport():
     invoiceDate = ''
     #try:
     if rawfile:  
-    	  voyage_vals  = xmltodict.parse(rawfile)['simplePayment'] #['xml']['From']
+    	  voyage_vals  = xmltodict.parse(rawfile)['voyage'] #['xml']['From']
           #invoice_vals = dict(val for val in res.iteritems())
 	  
           return PostgresConnector().genericVoyageImport(voyage_vals)

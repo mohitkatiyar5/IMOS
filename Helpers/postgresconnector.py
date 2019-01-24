@@ -876,60 +876,60 @@ class PostgresConnector:
                 self.ConnectToDatabase()
 
             cur = self.conn.cursor()
-	    vesselCode = self.validate(invoice_vals.get('vesselCode', None))
-	    vesselName = self.validate(invoice_vals.get('vesselName', None))
-	    vesselType = self.validate(invoice_vals.get('vesselType', None))
-	    vesselTypeCode = self.validate(invoice_vals.get('vesselTypeCode', None))
-            vesselFlag = self.validate(invoice_vals.get('vesselFlag', None))
-	    vesselDWT = self.validate(invoice_vals.get('vesselDWT', None))
-            vesselGRT = self.validate(invoice_vals.get('vesselGRT', None))
-	    vesselNRT = self.validate(invoice_vals.get('vesselNRT', None))
-            vesselYearBuilt = self.validate(invoice_vals.get('vesselYearBuilt', None))
-	    vesselNumberOfHolds = self.validate(invoice_vals.get('vesselNumberOfHolds', None))
-	    vesselNumberOfHatches = self.validate(invoice_vals.get('vesselNumberOfHatches', None))
-	    vesselSatPhoneNumA = self.validate(invoice_vals.get('vesselSatPhoneNumA', None))
-	    vesselSatPhoneNumB = self.validate(invoice_vals.get('vesselSatPhoneNumB', None))
-            vesselSatPhoneNumC = self.validate(invoice_vals.get('vesselSatPhoneNumC', None))
-	    vesselCelularNum = self.validate(invoice_vals.get('vesselCelularNum', None))
-            vesselFax = self.validate(invoice_vals.get('vesselFax', None))
-	    vesselTelex = self.validate(invoice_vals.get('vesselTelex', None))
-            vesselEmail = self.validate(invoice_vals.get('vesselEmail', None))
-	    vesselCallLetters = self.validate(invoice_vals.get('vesselCallLetters', None))
-	    vesselOwner = self.validate(invoice_vals.get('vesselOwner', None))
-	    vesselOperator = self.validate(invoice_vals.get('vesselOperator', None))
-	    vesselPniClub = self.validate(invoice_vals.get('vesselPniClub', None))
-            vesselExternalRef = self.validate(invoice_vals.get('vesselExternalRef', None))
-	    vesselImoNumber = self.validate(invoice_vals.get('vesselImoNumber', None))
-            lastTCIVoy = self.validate(invoice_vals.get('lastTCIVoy', None))
-	    latestTCIVoyNo = self.validate(invoice_vals.get('latestTCIVoyNo', None))
-            voyageNo = self.validate(invoice_vals.get('voyageNo', None))
-	    commenceDateTime = self.validate(invoice_vals.get('commenceDateTime', None))
-	    completeDateTime = self.validate(invoice_vals.get('completeDateTime', None))
-	    voyageStatus = self.validate(invoice_vals.get('voyageStatus', None))
-	    oprType = self.validate(invoice_vals.get('oprType', None))
-            fixtureId = self.validate(invoice_vals.get('fixtureId', None))
-	    fixtureDate = self.validate(invoice_vals.get('fixtureDate', None))
-            chaCoordinator = self.validate(invoice_vals.get('chaCoordinator', None))
-	    oprCoordinator = self.validate(invoice_vals.get('oprCoordinator', None))
-	    altOprCoordinator = self.validate(invoice_vals.get('altOprCoordinator', None))
-            controller = self.validate(invoice_vals.get('controller', None))
-	    fdManager = self.validate(invoice_vals.get('fdManager', None))
-	    financeCoordinator = self.validate(invoice_vals.get('financeCoordinator', None))
-	    prevStatus = self.validate(invoice_vals.get('prevStatus', None))
-	    tcoFixCode = self.validate(invoice_vals.get('tcoFixCode', None))
-            tciFixCode = self.validate(invoice_vals.get('tciFixCode', None))
-	    externalRef = self.validate(invoice_vals.get('externalRef', None))
-            voyRef = self.validate(invoice_vals.get('voyRef', None))
-	    lob = self.validate(invoice_vals.get('lob', None))
-            lobFull = self.validate(invoice_vals.get('lobFull', None))
-	    company = self.validate(invoice_vals.get('company', None))
-            companyFull = self.validate(invoice_vals.get('companyFull', None))
-	    counterparty = self.validate(invoice_vals.get('counterparty', None))
-	    counterpartyFull = self.validate(invoice_vals.get('counterpartyFull', None))
-	    cpDate = self.validate(invoice_vals.get('cpDate', None))
-	    entryDate = self.validate(invoice_vals.get('entryDate', None))
-            lastUserId = self.validate(invoice_vals.get('lastUserId', None))
-	    lastModifiedDate = self.validate(invoice_vals.get('lastModifiedDate', None))
+	    vesselCode = self.validate(voyage_vals.get('vesselCode', None))
+	    vesselName = self.validate(voyage_vals.get('vesselName', None))
+	    vesselType = self.validate(voyage_vals.get('vesselType', None))
+	    vesselTypeCode = self.validate(voyage_vals.get('vesselTypeCode', None))
+            vesselFlag = self.validate(voyage_vals.get('vesselFlag', None))
+	    vesselDWT = self.validate(voyage_vals.get('vesselDWT', None))
+            vesselGRT = self.validate(voyage_vals.get('vesselGRT', None))
+	    vesselNRT = self.validate(voyage_vals.get('vesselNRT', None))
+            vesselYearBuilt = self.validate(voyage_vals.get('vesselYearBuilt', None))
+	    vesselNumberOfHolds = self.validate(voyage_vals.get('vesselNumberOfHolds', None))
+	    vesselNumberOfHatches = self.validate(voyage_vals.get('vesselNumberOfHatches', None))
+	    vesselSatPhoneNumA = self.validate(voyage_vals.get('vesselSatPhoneNumA', None))
+	    vesselSatPhoneNumB = self.validate(voyage_vals.get('vesselSatPhoneNumB', None))
+            vesselSatPhoneNumC = self.validate(voyage_vals.get('vesselSatPhoneNumC', None))
+	    vesselCelularNum = self.validate(voyage_vals.get('vesselCelularNum', None))
+            vesselFax = self.validate(voyage_vals.get('vesselFax', None))
+	    vesselTelex = self.validate(voyage_vals.get('vesselTelex', None))
+            vesselEmail = self.validate(voyage_vals.get('vesselEmail', None))
+	    vesselCallLetters = self.validate(voyage_vals.get('vesselCallLetters', None))
+	    vesselOwner = self.validate(voyage_vals.get('vesselOwner', None))
+	    vesselOperator = self.validate(voyage_vals.get('vesselOperator', None))
+	    vesselPniClub = self.validate(voyage_vals.get('vesselPniClub', None))
+            vesselExternalRef = self.validate(voyage_vals.get('vesselExternalRef', None))
+	    vesselImoNumber = self.validate(voyage_vals.get('vesselImoNumber', None))
+            lastTCIVoy = self.validate(voyage_vals.get('lastTCIVoy', None))
+	    latestTCIVoyNo = self.validate(voyage_vals.get('latestTCIVoyNo', None))
+            voyageNo = self.validate(voyage_vals.get('voyageNo', None))
+	    commenceDateTime = self.validate(voyage_vals.get('commenceDateTime', None))
+	    completeDateTime = self.validate(voyage_vals.get('completeDateTime', None))
+	    voyageStatus = self.validate(voyage_vals.get('voyageStatus', None))
+	    oprType = self.validate(voyage_vals.get('oprType', None))
+            fixtureId = self.validate(voyage_vals.get('fixtureId', None))
+	    fixtureDate = self.validate(voyage_vals.get('fixtureDate', None))
+            chaCoordinator = self.validate(voyage_vals.get('chaCoordinator', None))
+	    oprCoordinator = self.validate(voyage_vals.get('oprCoordinator', None))
+	    altOprCoordinator = self.validate(voyage_vals.get('altOprCoordinator', None))
+            controller = self.validate(voyage_vals.get('controller', None))
+	    fdManager = self.validate(voyage_vals.get('fdManager', None))
+	    financeCoordinator = self.validate(voyage_vals.get('financeCoordinator', None))
+	    prevStatus = self.validate(voyage_vals.get('prevStatus', None))
+	    tcoFixCode = self.validate(voyage_vals.get('tcoFixCode', None))
+            tciFixCode = self.validate(voyage_vals.get('tciFixCode', None))
+	    externalRef = self.validate(voyage_vals.get('externalRef', None))
+            voyRef = self.validate(voyage_vals.get('voyRef', None))
+	    lob = self.validate(voyage_vals.get('lob', None))
+            lobFull = self.validate(voyage_vals.get('lobFull', None))
+	    company = self.validate(voyage_vals.get('company', None))
+            companyFull = self.validate(voyage_vals.get('companyFull', None))
+	    counterparty = self.validate(voyage_vals.get('counterparty', None))
+	    counterpartyFull = self.validate(voyage_vals.get('counterpartyFull', None))
+	    cpDate = self.validate(voyage_vals.get('cpDate', None))
+	    entryDate = self.validate(voyage_vals.get('entryDate', None))
+            lastUserId = self.validate(voyage_vals.get('lastUserId', None))
+	    lastModifiedDate = self.validate(voyage_vals.get('lastModifiedDate', None))
 
 	    col1 = '(vessel_code, vessel_name, vessel_type, vessel_type_code, vessel_flag, vessel_dwt, vessel_grt, vessel_nrt, vessel_year_built, vessel_number_of_holds, vessel_number_of_hatches, vessel_sat_phone_num_a, vessel_sat_phone_num_b, vessel_sat_phone_num_c,	vessel_celular_num, vessel_fax, vessel_telex, vessel_email, vessel_call_letters, vessel_owner, vessel_operator, vessel_pni_club,	vessel_external_ref, vessel_imo_number, last_tci_voy, latest_tci_Voy_no, voyage_no, commence_date_time, complete_date_time, voyage_status,	opr_type, fixture_id, fixture_date, cha_coordinator, opr_coordinator, alt_opr_coordinator, controller, fd_manager, finance_coordinator,	prev_status, tco_fix_code, tci_fix_code, external_ref, voy_ref, lob, lob_full, company, company_full, counterparty, counterparty_full, cp_date, entry_date, last_user_id, last_modified_date, create_uid, create_date, write_uid, write_date)'
 
@@ -938,7 +938,7 @@ class PostgresConnector:
 	    cur.execute(qry1)
 	    voyage_id = cur.fetchone()[0]
 
-	    userProperties = self.validate(invoice_vals.get('userProperties', {}))
+	    userProperties = self.validate(voyage_vals.get('userProperties', {}))
 	    if not isinstance(userProperties, dict):
 		userProperties = {}
 	    userProperty = self.validate(userProperties.get('userProperty', []))
@@ -957,7 +957,7 @@ class PostgresConnector:
 		user_property_id = cur.fetchone()[0]
 		print"========user_property_id========", user_property_id
 		
-	    portcall = self.validate(inv_lines.get('portcall', []))
+	    portcall = self.validate(voyage_vals.get('portcall', []))
 	    if not isinstance(portcall, list):
 	       portcall = [portcall]
 	    for pc in portcall:
@@ -1023,7 +1023,7 @@ class PostgresConnector:
 		    cargo_handling_id = cur.fetchone()[0]
 		    print"==========cargo_handling_id=======", cargo_handling_id
 
-		contracts = self.validate(inv_lines.get('contracts', {}))
+		contracts = self.validate(voyage_vals.get('contracts', {}))
 	        if not isinstance(contracts, dict):
 	           contracts = {}
 
@@ -1064,7 +1064,7 @@ class PostgresConnector:
 		    contract_id = cur.fetchone()[0]
 		    print"======contract_id======", contract_id
 
-		bunkerOnBoard = self.validate(inv_lines.get('bunkerOnBoard', {}))
+		bunkerOnBoard = self.validate(voyage_vals.get('bunkerOnBoard', {}))
 	        if not isinstance(bunkerOnBoard, dict):
 	           bunkerOnBoard = {}
 
@@ -1086,7 +1086,7 @@ class PostgresConnector:
 		    fuel_id = cur.fetchone()[0]
 		    print"==========fuel_id=======", fuel_id
 
-		voyageBunkers = self.validate(inv_lines.get('voyageBunkers', {}))
+		voyageBunkers = self.validate(voyage_vals.get('voyageBunkers', {}))
 	        if not isinstance(voyageBunkers, dict):
 	           voyageBunkers = {}
 
@@ -1107,7 +1107,7 @@ class PostgresConnector:
 		    print"=======bunker_id=====", bunker_id
 
 
-		bunkerPlan = self.validate(inv_lines.get('bunkerPlan', {}))
+		bunkerPlan = self.validate(voyage_vals.get('bunkerPlan', {}))
 	        if not isinstance(bunkerPlan, dict):
 	           bunkerPlan = {}
 
