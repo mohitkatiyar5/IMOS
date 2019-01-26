@@ -126,18 +126,16 @@ def importFreightInvoice():
     clientId = json_data.get('clientId',False) and json_data.get('clientId',False)[0] or ''
     if ((clientId and clientId.isspace()) or (clientId not in validClientIds)):
         return "INVALID CLIENT ID or NO CLIENT ID", 400	
-    transNo = ''
-    invoiceDate = ''
-    #try:
-    if rawfile:  
+    try:
+    	if rawfile:  
     	  invoice_vals  = xmltodict.parse(rawfile)['invoice'] #['xml']['From']
           #invoice_vals = dict(val for val in res.iteritems())
 	  
           return PostgresConnector().importFreightInvoice(invoice_vals)
-     #  else:
-	#   return "Some Error Occured"
-    #except:
-	#return "Some Error Occured"
+        else:
+	   return "Some Error Occured"
+    except:
+	   return "Some Error Occured"
 
 
 @app.route('/v1/importTCOInvoice', methods = ['POST'])
@@ -147,18 +145,14 @@ def importTCOInvoice():
     clientId = json_data.get('clientId',False) and json_data.get('clientId',False)[0] or ''
     if ((clientId and clientId.isspace()) or (clientId not in validClientIds)):
         return "INVALID CLIENT ID or NO CLIENT ID", 400	
-    transNo = ''
-    invoiceDate = ''
-    #try:
-    if rawfile:  
-    	  invoice_vals  = xmltodict.parse(rawfile)['invoice'] #['xml']['From']
-          #invoice_vals = dict(val for val in res.iteritems())
-	  
+    try:
+    	if rawfile:  
+    	  invoice_vals  = xmltodict.parse(rawfile)['invoice']
           return PostgresConnector().importTCOInvoice(invoice_vals)
-     #  else:
-	#   return "Some Error Occured"
-    #except:
-	#return "Some Error Occured"
+        else:
+	   return "Some Error Occured"
+    except:
+	   return "Some Error Occured"
 
 @app.route('/v1/genericInvoiceImport', methods = ['POST'])
 def genericInvoiceImport():
@@ -168,18 +162,14 @@ def genericInvoiceImport():
     clientId = json_data.get('clientId',False) and json_data.get('clientId',False)[0] or ''
     if ((clientId and clientId.isspace()) or (clientId not in validClientIds)):
         return "INVALID CLIENT ID or NO CLIENT ID", 400	
-    transNo = ''
-    invoiceDate = ''
-    #try:
-    if rawfile:  
-    	  invoice_vals  = xmltodict.parse(rawfile)['invoice'] #['xml']['From']
-          #invoice_vals = dict(val for val in res.iteritems())
-	  
+    try:
+    	if rawfile:  
+    	  invoice_vals  = xmltodict.parse(rawfile)['invoice']
           return PostgresConnector().genericInvoiceImport(invoice_vals, inv_type)
-     #  else:
-	#   return "Some Error Occured"
-    #except:
-	#return "Some Error Occured"
+        else:
+	   return "Some Error Occured"
+    except:
+	   return "Some Error Occured"
 
 @app.route('/v1/genericPaymentImport', methods = ['POST'])
 def genericPaymentImport():
@@ -189,18 +179,14 @@ def genericPaymentImport():
     clientId = json_data.get('clientId',False) and json_data.get('clientId',False)[0] or ''
     if ((clientId and clientId.isspace()) or (clientId not in validClientIds)):
         return "INVALID CLIENT ID or NO CLIENT ID", 400	
-    transNo = ''
-    invoiceDate = ''
-    #try:
-    if rawfile:  
-    	  payment_vals  = xmltodict.parse(rawfile)['simplePayment'] #['xml']['From']
-          #invoice_vals = dict(val for val in res.iteritems())
-	  
+    try:
+    	if rawfile:  
+    	  payment_vals  = xmltodict.parse(rawfile)['simplePayment']
           return PostgresConnector().genericPaymentImport(payment_vals, payment_type)
-     #  else:
-	#   return "Some Error Occured"
-    #except:
-	#return "Some Error Occured"
+        else:
+	   return "Some Error Occured"
+    except:
+	   return "Some Error Occured"
 
 @app.route('/v1/genericVoyageImport', methods = ['POST'])
 def genericVoyageImport():
@@ -209,18 +195,30 @@ def genericVoyageImport():
     clientId = json_data.get('clientId',False) and json_data.get('clientId',False)[0] or ''
     if ((clientId and clientId.isspace()) or (clientId not in validClientIds)):
         return "INVALID CLIENT ID or NO CLIENT ID", 400	
-    transNo = ''
-    invoiceDate = ''
-    #try:
-    if rawfile:  
-    	  voyage_vals  = xmltodict.parse(rawfile)['voyage'] #['xml']['From']
-          #invoice_vals = dict(val for val in res.iteritems())
-	  
+    try:
+	if rawfile:  
+    	  voyage_vals  = xmltodict.parse(rawfile)['voyage']
           return PostgresConnector().genericVoyageImport(voyage_vals)
-     #  else:
-	#   return "Some Error Occured"
-    #except:
-	#return "Some Error Occured"
+        else:
+	   return "Some Error Occured"
+    except:
+	   return "Some Error Occured"
+
+@app.route('/v1/genericVesselImport', methods = ['POST'])
+def genericVesselImport():
+    rawfile = request.data
+    json_data = dict(request.args)
+    clientId = json_data.get('clientId',False) and json_data.get('clientId',False)[0] or ''
+    if ((clientId and clientId.isspace()) or (clientId not in validClientIds)):
+        return "INVALID CLIENT ID or NO CLIENT ID", 400	
+    try:
+       if rawfile:  
+    	  vessel_vals  = xmltodict.parse(rawfile)['vesselExport']
+          return PostgresConnector().genericVesselImport(vessel_vals)
+       else:
+	   return "Some Error Occured"
+    except:
+	return "Some Error Occured"
 
 
 

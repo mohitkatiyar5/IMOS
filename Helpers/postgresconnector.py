@@ -853,11 +853,11 @@ class PostgresConnector:
             baseCurrencyAmount = self.validate(invoice_vals.get('baseCurrencyAmount', None))
             
 
-	    col1 = '(invoice_trans_no, entry_date, act_date, pay_mode, bank_code, currency_amount, currency, base_currency_amount, pay_type, create_date, create_uid, write_date, write_uid)'
+	    col = '(invoice_trans_no, entry_date, act_date, pay_mode, bank_code, currency_amount, currency, base_currency_amount, pay_type, create_date, create_uid, write_date, write_uid)'
 
-	    qry1 = "INSERT INTO imos_staging_payment %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col1, invoiceTransNo, entryDate, actDate, payMode, bankCode, currencyAmount, currency, baseCurrencyAmount, pay_type) 
+	    qry = "INSERT INTO imos_staging_payment %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col, invoiceTransNo, entryDate, actDate, payMode, bankCode, currencyAmount, currency, baseCurrencyAmount, pay_type) 
 	     
-	    cur.execute(qry1)
+	    cur.execute(qry)
 	    payment_id = cur.fetchone()[0]
 
             #inv_lines_dict = dict(val for val in inv_lines.iteritems())    
@@ -1137,6 +1137,59 @@ class PostgresConnector:
             #columns = ('id')
 	    #results = map(lambda x: (dict(zip(columns, x))), [inv_id])
 	    res = dtx([{'id': voyage_id}], custom_root='ID', attr_type=False)
+	    cur.close()
+	    return Response(res, content_type='application/XML; charset=utf-8')
+        except Exception as e:
+	    cur.close()
+            return str(e)
+
+#genericVesselImport:
+    def genericVesselImport(self, vessel_vals):
+        try:
+	    if(not self.conn):
+                self.ConnectToDatabase()
+            cur = self.conn.cursor()
+	    vesselCode = self.validate(vessel_vals.get('vesselName', None))
+	    vesselName = self.validate(vessel_vals.get('vesselName', None))
+	    vesselType = self.validate(vessel_vals.get('vesselType', None))
+	    vesselClass = self.validate(vessel_vals.get('vesselClass', None))
+	    ownershipType = self.validate(vessel_vals.get('ownershipType', None))
+            callLetters = self.validate(vessel_vals.get('callLetters', None))
+	    loa = self.validate(vessel_vals.get('loa', None))
+            beam = self.validate(vessel_vals.get('beam', None))
+	    depth = self.validate(vessel_vals.get('depth', None))
+	    dwt = self.validate(vessel_vals.get('dwt', None))
+	    capacityMT = self.validate(vessel_vals.get('capacityMT', None))
+	    summerDraft = self.validate(vessel_vals.get('summerDraft', None))
+	    winterDraft = self.validate(vessel_vals.get('winterDraft', None))
+            tpc = self.validate(vessel_vals.get('tpc', None))
+	    fax = self.validate(vessel_vals.get('fax', None))
+            imoNo = self.validate(vessel_vals.get('imoNo', None))
+	    cellular = self.validate(vessel_vals.get('cellular', None))
+	    yearBuilt = self.validate(vessel_vals.get('yearBuilt', None))
+	    vesselEmail = self.validate(vessel_vals.get('vesselEmail', None))
+	    externalRef = self.validate(vessel_vals.get('externalRef', None))
+	    satPhone = self.validate(vessel_vals.get('satPhone', None))
+            satPhoneA = self.validate(vessel_vals.get('satPhoneA', None))
+	    satPhoneB = self.validate(vessel_vals.get('satPhoneB', None))
+            miniM = self.validate(vessel_vals.get('miniM', None))
+	    masterPhone = self.validate(vessel_vals.get('masterPhone', None))
+	    bridgePhone = self.validate(vessel_vals.get('bridgePhone', None))
+	    isInactive = self.validate(vessel_vals.get('isInactive', None))
+	    rejected = self.validate(vessel_vals.get('rejected', None))
+	    veslinkID = self.validate(vessel_vals.get('veslinkID', None))
+            
+	    col = '(vessel_code, vessel_name, vessel_type, vessel_class, ownership_type, call_letters, loa, beam, depth, dwt, capacity_mt, summer_draft, winter_draft, tpc, fax, imo_no, cellular, year_built, vessel_email, external_ref, sat_phone, sat_phone_a, sat_phone_b, mini_m, master_phone, bridge_phone, is_inactive, rejected, veslink_id, create_date, create_uid, write_date, write_uid)'
+
+	    qry = "INSERT INTO imos_vessel_staging %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col, vesselCode, vesselName, vesselType, vesselClass, ownershipType, callLetters, loa, beam, depth, dwt, capacityMT, summerDraft, winterDraft, tpc, fax, imoNo, cellular, yearBuilt, vesselEmail, externalRef, satPhone, satPhoneA, satPhoneB, miniM, masterPhone, bridgePhone, isInactive, rejected, veslinkID) 
+	     
+	    cur.execute(qry)
+	    vessel_id = cur.fetchone()[0]
+
+            #inv_lines_dict = dict(val for val in inv_lines.iteritems())    
+            #columns = ('id')
+	    #results = map(lambda x: (dict(zip(columns, x))), [inv_id])
+	    res = dtx([{'id': vessel_id}], custom_root='ID', attr_type=False)
 	    cur.close()
 	    return Response(res, content_type='application/XML; charset=utf-8')
         except Exception as e:
