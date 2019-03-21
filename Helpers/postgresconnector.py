@@ -802,7 +802,11 @@ class PostgresConnector:
 		vcinVesselNumber = self.validate(inv_lines.get('vcinVesselNumber', None))
 		vcinVesselNumber = self.validate(inv_lines.get('vcinVesselNumber', None))
 		periodStartDate = self.validate(inv_lines.get('periodEndDate', None))
+		if not isinstance(periodStartDate, str):
+		   periodStartDate = 'Null'
 		periodEndDate = self.validate(inv_lines.get('periodEndDate', None))
+		if not isinstance(periodEndDate, str):
+		   periodEndDate = 'Null'
 
 	        col2 = '(staging_invoice_id, trans_no, trans_type, seq_no, opr_seq_no, opr_bill_code, bill_sub_seq, bill_sub_code, bill_sub_source, company_code, company_external_ref, company_contact, company_contact_phone, lob_code, dept_code, vessel_code, vessel_name, vessel_external_ref, vessel_cross_ref, vessel_imo_no, vessel_type, vessel_grt, vendor_no, vendor_name, vendor_short_name, vendor_external_ref, vendor_cross_ref, vendor_is_internal, intercompany_code, voyage_no, port_name, port_no, port_un_code, port_country_code, ledger_code, apar_code, act_date, memo,	currency_amount, currency, exchangerate, base_currency_amount, tax_code, company_brokerage, counterparty_brokerage, last_user_id, last_modified_date, description, tax_rate, trade_route, trade_route_code, trade_route_ext_ref, opr_type, ops_coordinator, voy_ref, voyage_company_code, voyage_tci_code, voyage_tco_code, freight_type, freight_rate, charterer, charterer_no, charterer_external_ref, shipper, debtor, freight_collector, shipper_no, debtor_no, freight_collector_no, lumpsum, percentage, quantity, base_freight_amount, bl_date, bl_code,	cp_unit, consignee,  commercial_id, consignee_no, agent, ref_bl_no, combine_indicator, tranship_indicator, tranship_seq, tranship_date, tranship_port, tranship_to_vessel, tranship_to_voy_no, tranship_gross, tranship_gross_unit, cargo_full_name, cargo_group_code, bl_qty, cargold, imported_cargo, cao_no, cargo_ref_contract, cargo_exposure_vessel_number, cargo_name, broker, name1, func1, name2, func2,	port_call_seq, voyage_ref,	cargo_vessel_number, cargo_reference, vcin_vessel_number, vcin_reference, period_start_date, period_end_date, create_date, create_uid, write_date, write_uid)'
 
@@ -979,15 +983,25 @@ class PostgresConnector:
 		portOcean = self.validate(pc.get('portOcean', None))
 		defaultLocationRef = self.validate(pc.get('defaultLocationRef', None))
 		ETA = self.validate(pc.get('ETA', None))
+		if not isinstance(ETA, str):
+		   ETA = 'Null'	
 		ETALocal = self.validate(pc.get('ETALocal', None))
-		ETD = self.validate(pc.get('ETA', None))
-		ETDLocal = self.validate(pc.get('ETALocal', None))
+		if not isinstance(ETALocal, str):
+		   ETALocal = 'Null'
+		ETD = self.validate(pc.get('ETD', None))
+		if not isinstance(ETD, str):
+		   ETD = 'Null'
+		ETDLocal = self.validate(pc.get('ETDLocal', None))
+		if not isinstance(ETDLocal, str):
+		   ETDLocal = 'Null'
 
 		col3 = '(stage_portcall_voyage_id, seq, function, status, port_no, port_name, port_call_id, port_country_code, port_external_ref, port_area,	port_region_code, port_region, port_ocean, default_location_ref, eta, eta_local, etd, create_date, create_uid, write_date, write_uid)'
 
 		qry3 = "INSERT INTO imos_voyage_staging_port_call %s VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW() AT TIME ZONE 'UTC', 1, NOW() AT TIME ZONE 'UTC', 1) RETURNING ID" % (col3, voyage_id, seq, function, status, portNo, portName, portcallID, portCountryCode, portExternalRef, portArea, portRegionCode, portRegion, portOcean, defaultLocationRef, ETA, ETALocal, ETD)	
+		print"======qry3===", qry3
 		cur.execute(qry3)
 		port_call_id = cur.fetchone()[0]
+		print"======port_call_id=======", port_call_id
 
 		cargoHandling = self.validate(pc.get('cargoHandling', {}))
 		if not isinstance(cargoHandling, dict):
